@@ -4,19 +4,19 @@ from django.http import HttpResponse
 
 # Create your views here.
 def course_details(request,course_id):
-    return HttpResponse("From course_details")
+    return render(request,'course_details.html')
 
 def review(request,course_id):
-    return HttpResponse("From review")
+    return render(request,'review.html')
 
 def forum(request,course_id):
-    return HttpResponse("From forum")
+    return render(request,'forum.html')
 
 def topic(request,topic_id):
-    return HttpResponse("From topic")
+    return render(request,'topic.html')
 
 def content(request,content_id):
-    return HttpResponse("From content")
+    return render(request,'content.html')
 
 def add_topic(request,course_id):
     return HttpResponse("From add_topic")

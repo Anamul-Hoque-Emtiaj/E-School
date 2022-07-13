@@ -4,30 +4,30 @@ from django.http import HttpResponse
 
 # Create your views here.
 def home(request):
-    return HttpResponse("From Home")
+    return render(request,'home.html')
 
 def login(request):
-    return HttpResponse("From login")
+     return render(request,'login.html')
 
 def register_student(request):
-    return HttpResponse("From register_student")
+     return render(request,'register_student.html')
 
 def register_teacher(request):
-    return HttpResponse("From register_teacher")
+    return render(request,'register_teacher.html')
     
 def logout(request):
     return HttpResponse("From logout")
 
 
 def all_teachers(request):
-    return HttpResponse("From Profile all_teachers")
+    return render(request,'all_teachers.html')
 
 def all_students(request):
-    return HttpResponse("From Profile all_students")
+    return render(request,'all_students.html')
 
 def all_courses(request):
-    return HttpResponse("From Profile all_courses")
+    return render(request,'all_courses.html')
 
 def search_courses(request):
-    return HttpResponse("From Profile search_courses")
+    return render(request,'search_courses.html')
 

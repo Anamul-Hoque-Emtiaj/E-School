@@ -4,31 +4,34 @@ from django.http import HttpResponse
 
 # Create your views here.
 def profile(request,user_id):
-    return HttpResponse("From Profile")
+    return render(request,'profile.html')
+
 
 def setting(request,user_id):
-    return HttpResponse("From Profile setting")
+    return render(request,'setting.html')
+
 
 def notification(request,user_id):
-    return HttpResponse("From Profile notification")
+    return render(request,'notification.html')
+
 
 def enrolled_course(request,user_id):
-    return HttpResponse("From Profile enrolled_course")
+    return render(request,'enrolled_course.html')
 
 def progress(request,user_id):
-    return HttpResponse("From Profile progress")
+    return render(request,'progress.html')
+
 
 def taken_course(request,user_id):
-    return HttpResponse("From Profile taken_course")
+    return render(request,'taken_course.html')
 
-def taken_course(request,user_id):
-    return HttpResponse("From Profile taken_course")
 
 def add_course(request,user_id):
     return HttpResponse("From Profile add_course")
 
 def course_approval(request):
-    return HttpResponse("From Profile course_approval")
+    return render(request,'course_approval.html')
+
 
 
 
