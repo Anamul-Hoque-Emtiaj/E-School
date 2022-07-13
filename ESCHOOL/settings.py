@@ -79,10 +79,26 @@ WSGI_APPLICATION = 'ESCHOOL.wsgi.application'
 
 DATABASES = {
     'default': {
+        
+    },
+    'auth_db': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'eschool_db': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'ESCHOOL',
+        'USER': 'ahe',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '1521',
     }
 }
+
+DATABASE_ROUTERS=[
+    'Utils.db_routers.AuthRouter',
+    'Utils.db_routers.ESchoolDbRouter',
+]
 
 
 # Password validation

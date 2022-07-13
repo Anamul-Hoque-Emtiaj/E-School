@@ -1,6 +1,8 @@
+from django.db import connections
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import HttpResponse
+from Utils.fetcher import *
 
 # Create your views here.
 def home(request):
@@ -23,7 +25,12 @@ def all_teachers(request):
     return render(request,'all_teachers.html')
 
 def all_students(request):
-    return render(request,'all_students.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('SELECT * from "Users"')
+        users=dictfetchall(c)       
+        print(users)
+        return render(request,'all_students.html',{'users':users}) 
+    #return render(request,'all_students.html')
 
 def all_courses(request):
     return render(request,'all_courses.html')
