@@ -12,21 +12,103 @@
   </head>
   <body>
     <div >
-        <header>
-            <div class="bg-info p-2">
-                 Header
+        <header class="mb-4">
+          {% if userId %}
+          <nav class="navbar navbar-expand-lg navbar-light bg-info">
+            <a class="navbar-brand" href="/">ESCHOOL</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/all_courses">Courses</a>
+                </li>
+                
+              </ul>
+       
+        
+              <form class="form-inline my-2 my-md-0" action="{% url 'search_courses' %}" method="POST">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" name="search" type="search" id="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+              </form>
+      
+              <ul class="navbar-nav ">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Profile</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#"><i class="fa-solid fa-bell"><span class="badge badge-light">{{num_of_not}}</span></i></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Logout</a>
+                </li>
+                
+              </ul>
+              
             </div>
+          </nav>
+          {% else %}
+          <nav class="navbar navbar-expand-lg navbar-light bg-info">
+            <a class="navbar-brand" href="/">ESCHOOL</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/all_courses">Courses</a>
+                </li>
+                
+              </ul>
+       
+        
+              <form class="form-inline my-2 my-md-0" action="{% url 'search_courses' %}" method="POST">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" id="search" name="search" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+              </form>
+    
+              <ul class="navbar-nav ">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                    Register 
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/register_student">AS A Student</a>
+                    <a class="dropdown-item" href="/register_teacher">AS A Teacher</a>
+                  
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/login">Login</a>
+                </li>
+                
+              </ul>
+              
+            </div>
+          </nav>
+          
+          {% endif %}
         </header>
-        <div >
+        <div class="pt-5">
            {% block contain %}
            
            {% endblock %}
         </div>
-        <footer>
-            <div class="bg-dark p-2 text-light ">
-                 Footer
-            </div>
-        </footer>
+        <div style="padding-top: 100px;"></div>
+        <div class="bg-dark text-light text-center p-4">
+          &copy;ESCHOOL
+        </div>
     </div>
 
     <!-- Optional JavaScript -->
@@ -34,5 +116,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3fae23f953.js" crossorigin="anonymous"></script>
   </body>
 </html>

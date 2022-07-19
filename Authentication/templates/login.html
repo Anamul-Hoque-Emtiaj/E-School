@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 {% block contain %}
-<div class="container">
-    From Login
+<div class="col-lg-5 shadow mx-auto p-0 m-5">
+    <div class="alert alert-success "> Log In Here</div>
+    <div class="p-4">
+        <form action="{% url 'login'%}" method="POST">
+            {% csrf_token %}
+            {% if error %}
+            <div style="padding-top: 5px;"></div>
+            <div class="alert alert-danger" style="padding-left: 200px;padding-top: 5;">{{error}}</div>
+            {% endif %}
+            <div class="form-group">
+              <label for="email">Email address</label>
+              <input type="email" class="form-control" name="email"  id="email"  placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+    </div>
 </div>
 {% endblock %}
