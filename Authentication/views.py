@@ -22,18 +22,25 @@ def logout(request):
 
 
 def all_teachers(request):
-    return render(request,'all_teachers.html')
+     with connections['eschool_db'].cursor() as c:
+        c.execute('SELECT * from "Users" Where USER_ID IN (SELECT T_ID from "Teachers") ')
+        users=dictfetchall(c)       
+        return render(request,'all_teachers.html',{'users':users}) 
+    #return render(request,'all_teachers.html')
 
 def all_students(request):
     with connections['eschool_db'].cursor() as c:
-        c.execute('SELECT * from "Users"')
+        c.execute('SELECT * from "Users" Where USER_ID IN (SELECT S_ID from "Students") ')
         users=dictfetchall(c)       
-        print(users)
         return render(request,'all_students.html',{'users':users}) 
     #return render(request,'all_students.html')
 
 def all_courses(request):
-    return render(request,'all_courses.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('SELECT * from "Courses" ')
+        courses=dictfetchall(c)       
+        return render(request,'all_courses.html',{'courses':courses}) 
+    #return render(request,'all_courses.html')
 
 def search_courses(request):
     return render(request,'search_courses.html')

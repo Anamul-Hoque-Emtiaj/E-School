@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block contain %}
 <div class="container">
-    From all teacher
+    {% for user in users %}
+    <ul>
+        <li>Name: {{user.NAME}}</li>
+        <li>Email: {{user.EMAIL}}</li>
+        <li>Institution: {{user.INSTITUTION}}</li>
+    </ul>
+    {% endfor %}
 </div>
 {% endblock %}
