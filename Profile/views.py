@@ -4,7 +4,7 @@ from django.http import HttpResponse
 
 # Create your views here.
 def profile(request,user_id):
-    return render(request,'profile.html')
+    return render(request,'profile.html', {'num_of_not':5})
 
 
 def setting(request,user_id):

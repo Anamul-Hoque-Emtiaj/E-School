@@ -88,8 +88,8 @@ DATABASES = {
     'eschool_db': {
         'ENGINE': 'django.db.backends.oracle',
         'NAME': 'ESCHOOL',
-        'USER': 'ahe',
-        'PASSWORD': '123',
+        'USER': 'ESCHOOL',
+        'PASSWORD': 'eschool',
         'HOST': 'localhost',
         'PORT': '1521',
     }
