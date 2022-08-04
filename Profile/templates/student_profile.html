@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% if 'userid' in request.session %}
+{% block contain1 %}
+    {% if owner == 1 %}
+        <div  style="width:300px; margin:0 auto;">
+            <h2>My Profile</h2><br>
+            
+            <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+           
+            <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+        </div>
+        <div  style="width:500px; margin:0 auto;">  
+            <p ><h5 >Email: {{ user.EMAIL }}  </h5></p>
+        </div>
+    {% else %}
+    <div  style="width:300px; margin:0 auto;">
+        <h2>Student's Profile</h2><br>
+        
+        <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+       
+        <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+    </div>
+    {% endif %}
+{% endblock %}
+{% else %}
+{% block contain2 %}
+<div  style="width:300px; margin:0 auto;">
+    <h2>Student's Profile</h2><br>
+    
+    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+   
+    <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+</div>
+{% endblock %}
+{% endif %}

@@ -51,7 +51,8 @@ def register_student(request):
                 del request.session['role']
             request.session['userid'] = SID
             request.session['role'] = 'student'
-            return redirect(f'profile/{SID}')
+            #return redirect(f'profile/{SID}')
+            return redirect('profile',user_id=SID)
     else:
         return render(request,'register_student.html')
 
@@ -72,7 +73,8 @@ def register_teacher(request):
                 del request.session['role']
             request.session['userid'] = TID
             request.session['role'] = 'teacher'
-            return redirect(f'profile/{TID}')
+            #return redirect(f'profile/{TID}')
+            return redirect('profile',user_id=TID)
     else:
         return render(request,'register_teacher.html')
     

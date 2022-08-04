@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
-{% block contain %}
-<div class="container">
+{% if 'userid' in request.session %}
+{% block contain1 %}
+<div class="container mb-5">
+    from home Lorem ipsum dolor sit amet consectetur adipisicing elit. Non sunt delectus ad nam inventore nulla porro tenetur laborum repellat molestiae, vitae reprehenderit harum aliquam dolores, quis voluptas id laboriosam. Est.
+</div>
+{% endblock %}
+{% else %}
+{% block contain2 %}
+<div class="container p-4 m-5">
     from home
 </div>
 {% endblock %}
+{% endif %}
