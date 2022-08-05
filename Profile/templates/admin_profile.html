@@ -4,10 +4,8 @@
 {% block contain1 %}
     {% if owner == 1 %}
         <div  style="width:300px; margin:0 auto;">
-            <h2>My Profile</h2><br>
-            
             <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-           
+            <h2 class="ml-3">{{ user.role }}</h2>
             <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
         </div>
         <div  style="width:500px; margin:0 auto;">  
@@ -15,10 +13,8 @@
         </div>
     {% else %}
     <div  style="width:300px; margin:0 auto;">
-        <h2>Admin's Profile</h2><br>
-        
         <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-       
+        <h2 class="ml-3">{{ user.role }}</h2>
         <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
     </div>
     {% endif %}
@@ -26,10 +22,8 @@
 {% else %}
 {% block contain2 %}
 <div  style="width:300px; margin:0 auto;">
-    <h2>Admin's Profile</h2><br>
-    
     <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-   
+    <h2 class="ml-3">{{ user.role }}</h2>
     <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
 </div>
 {% endblock %}

@@ -3,34 +3,194 @@
 {% if 'userid' in request.session %}
 {% block contain1 %}
     {% if owner == 1 %}
+        <div class="mt-5"></div>
         <div  style="width:300px; margin:0 auto;">
-            <h2>My Profile</h2><br>
-            
             <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-           
-            <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+            <h2 class="ml-3">{{ user.role }}</h2>
+            <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>  
+            <p><h3 class="ml-3" style="color:black">{{ user.DESIGNATION }} </h3> </p>  
         </div>
-        <div  style="width:500px; margin:0 auto;">  
+        <div class="mt-5"></div>
+        <div  style="width:900px; margin:0 auto;">  
             <p ><h5 >Email: {{ user.EMAIL }}  </h5></p>
+            <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+            <p ><h5 >Registered: {{ user.RDATE }}  </h5></p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+                Add New Course
+            </button>
+            
+            
+            <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="addCourseModal">Course Registration</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form class="p-4">
+                        <div class="mb-2">
+                          <label for="title">Course Title : </label>
+                          <input type="text" class="form-control" id="title">
+                        </div>
+                        
+                        <div class="form-group mb-2">
+                          <label for="description">DESCRIPTION</label>
+                          <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
+            
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Add Course</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="line"></div>
+            <div>
+                <p ><h5 >Course Taken:</h5></p>
+                <table class="table table-hover">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Num of Students</th>
+                        <th scope="col">Ratting</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in taken_course %}
+                        <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                            <td>{{course.TITLE}}</td>
+                            <td>{{course.NUM_OF_STUDENTS}}</td>
+                            <td>{{course.RATTING}}</td>
+                            {% if course.APPROVED == 1 %}
+                            <td>Approved</td>
+                            {% elif course.APPROVED == -1 %}
+                            <td>Rejected</td>
+                            {% else %}
+                            <td>Pending</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="line"></div>
+            <div>
+                <p ><h5 >Course Contributed:</h5></p>
+                <table class="table table-hover">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Num of Students</th>
+                        <th scope="col">Ratting</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in contributed_course %}
+                          <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                            <td>{{course.TITLE}}</td>
+                            <td>{{course.NUM_OF_STUDENTS}}</td>
+                            <td>{{course.RATTING}}</td>
+                          </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     {% else %}
+    <div class="mt-5"></div>
     <div  style="width:300px; margin:0 auto;">
-        <h2>Teacher's Profile</h2><br>
         
         <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-       
-        <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+        <h2 class="ml-3">{{ user.role }}</h2>
+        <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
+        <p><h3 class="ml-3" style="color:black">{{ user.DESIGNATION }} </h3> </p>
+    </div>
+    <div class="mt-5"></div>
+    <div  style="width:900px; margin:0 auto;">  
+        <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+        <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
+        <div class="line"></div>
+        <div>
+            <p ><h5 >Course Taken:</h5></p>
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Num of Students</th>
+                    <th scope="col">Ratting</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for course in taken_course %}
+                      {% if  course.APPROVED == 1 %}
+                      <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                        <td>{{course.TITLE}}</td>
+                        <td>{{course.NUM_OF_STUDENTS}}</td>
+                        <td>{{course.RATTING}}</td>
+                      </tr>
+                      {% endif %}
+                    {% endfor %}
+                    {% for course in contributed_course %}
+                      <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                        <td>{{course.TITLE}}</td>
+                        <td>{{course.NUM_OF_STUDENTS}}</td>
+                        <td>{{course.RATTING}}</td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% endif %}
 {% endblock %}
 {% else %}
 {% block contain2 %}
+<div class="mt-5"></div>
 <div  style="width:300px; margin:0 auto;">
-    <h2>Teacher's Profile</h2><br>
     
     <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-   
-    <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+    <h2 class="ml-3">{{ user.role }}</h2>
+    <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>   
+    <p><h3 class="ml-3" style="color:black">{{ user.DESIGNATION }} </h3> </p> 
+</div>
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;">  
+    <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+    <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
+    <div class="line"></div>
+    <div>
+        <p ><h5 >Course Taken:</h5></p>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Num of Students</th>
+                <th scope="col">Ratting</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for course in taken_course %}
+                  <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                    <td>{{course.TITLE}}</td>
+                    <td>{{course.NUM_OF_STUDENTS}}</td>
+                    <td>{{course.RATTING}}</td>
+                  </tr>
+                {% endfor %}
+                {% for course in contributed_course %}
+                  <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                    <td>{{course.TITLE}}</td>
+                    <td>{{course.NUM_OF_STUDENTS}}</td>
+                    <td>{{course.RATTING}}</td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 {% endif %}

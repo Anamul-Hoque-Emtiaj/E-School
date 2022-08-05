@@ -97,7 +97,7 @@ def all_students(request):
         users=dictfetchall(c)       
     return render(request,'all_students.html',{'users':users}) 
 
-def all_courses(request):
+def all_courses(request,sortedBy):
     with connections['eschool_db'].cursor() as c:
         c.execute('SELECT * from "Courses" ')
         courses=dictfetchall(c)       

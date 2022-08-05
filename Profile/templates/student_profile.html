@@ -3,34 +3,78 @@
 {% if 'userid' in request.session %}
 {% block contain1 %}
     {% if owner == 1 %}
+        <div class="mt-5"></div>
         <div  style="width:300px; margin:0 auto;">
-            <h2>My Profile</h2><br>
-            
             <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-           
-            <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+            <h2 class="ml-3">{{ user.role }}</h2>
+            <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
         </div>
-        <div  style="width:500px; margin:0 auto;">  
+        <div class="mt-5"></div>
+        <div  style="width:900px; margin:0 auto;">  
             <p ><h5 >Email: {{ user.EMAIL }}  </h5></p>
+            <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+            <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
+
+            <div class="line"></div>
+            <div>
+                <p ><h5 >Course Taken:</h5></p>
+                <table class="table table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Enroll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr onclick="window.location='/course/{{course.COURSE_ID}}';">
+                            <td>{{course.TITLE}}</td>
+                            {% if course.ISAPPROVED == 0 %}
+                            <td>Pending</td>
+                            {% elif course.ISAPPROVED == -1 %}
+                            <td>Rejected</td>
+                            {% elif course.PROGRESS == 1 %}
+                            <td>Completed</td>
+                            {% else %}
+                            <td>Running</td>
+                            {% endif %}
+                            <td>{{course.Date}} </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+           
         </div>
+        
     {% else %}
+    <div class="mt-5"></div>
     <div  style="width:300px; margin:0 auto;">
-        <h2>Student's Profile</h2><br>
         
         <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-       
-        <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+        <h2 class="ml-3">{{ user.role }}</h2>
+        <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
+    </div>
+    <div class="mt-5"></div>
+    <div  style="width:900px; margin:0 auto;">  
+        <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+        <p ><h5 >Registered: {{ user.RDATE }}  </h5></p>
     </div>
     {% endif %}
 {% endblock %}
 {% else %}
 {% block contain2 %}
+<div class="mt-5"></div>
 <div  style="width:300px; margin:0 auto;">
-    <h2>Student's Profile</h2><br>
-    
     <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-   
-    <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+    <h2 class="ml-3">{{ user.role }}</h2>
+    <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
+</div>
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;">  
+    <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
+    <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
 </div>
 {% endblock %}
 {% endif %}

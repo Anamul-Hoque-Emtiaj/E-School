@@ -1,13 +1,85 @@
 {% extends 'base.html' %}
-{% block contain2 %}
-<div class="container">
-    {% for course in courses %}
-    <ul>
-        <li>Title: {{course.TITLE}}</li>
-        <li>Subject: {{course.SUBJECT}}</li>
-        <li>Ratting: {{course.RATTING}}</li>
-        <li>Num OF Student: {{course.NUM_OF_STUDENTS}}</li>
-    </ul>
-    {% endfor %}
-</div>
+{% load static %}
+{% if 'userid' in request.session %}
+{% block contain1 %}
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;"> 
+    <ul class="list-group list-group-flush">
+        {% for course in courses %}
+        {% if course.APPROVED == 1 %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  " onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;"  >
+            <div class="col-md-1">
+                <img src="{% static 'images/course.png'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;">
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h4 style="color:#069">Title: {{course.TITLE}}</h4>
+                    </div>
+    
+                 </div>
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Ratting : {{course.RATTING}}</h6>
+                    </div>
+        
+                </div>              
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Students : {{course.NUM_OF_STUDENTS}}</h6>
+                    </div>
+        
+                </div>
+                
+            </div>
+          
+            </div>
+          </li>
+        {% endif %}
+        {% endfor %}
+    </ul> 
+</div> 
 {% endblock %}
+{% else %}
+{% block contain2 %}
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;"> 
+    <ul class="list-group list-group-flush">
+        {% for course in courses %}
+        {% if course.APPROVED == 1 %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  " onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;"  >
+            <div class="col-md-1">
+                <img src="{% static 'images/course.png'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;">
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h4 style="color:#069">Title: {{course.TITLE}}</h4>
+                    </div>
+    
+                 </div>
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Ratting : {{course.RATTING}}</h6>
+                    </div>
+        
+                </div>              
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Students : {{course.NUM_OF_STUDENTS}}</h6>
+                    </div>
+        
+                </div>
+                
+            </div>
+          
+            </div>
+          </li>
+        {% endif %}
+        {% endfor %}
+    </ul> 
+</div> 
+{% endblock %}
+{% endif %}

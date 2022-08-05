@@ -12,6 +12,6 @@ urlpatterns = [
 
     path('all_students', views.all_students, name='all_students' ), #for only admin
     path('all_teachers', views.all_teachers, name='all_teachers' ),
-    path('all_courses', views.all_courses, name='all_courses' ),
+    path('all_courses/<sortedBy>', views.all_courses, name='all_courses' ),
     path('search_courses', views.search_courses, name='search_courses' ),
 ]
