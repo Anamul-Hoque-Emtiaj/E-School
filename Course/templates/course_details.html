@@ -1,14 +1,171 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% if 'userid' in request.session %}
 {% block contain1 %}
-<div class="container mb-5">
-    {{course}}
-    {{role}}
+
+<div class="mt-5"></div>
+<div  style="width:400px; margin:0 auto;"> 
+    <img class="ml-5" src="{% static 'images/course_bg.png'%}" width="150px" >
+    <p ><h3  style="color:black">{{ course.TITLE }} </h3> </p>    
+    <p class="text-dark">{{ course.DESCRIPTIONS }} </p> 
+</div>
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;">  
+    <p ><h5 >Students: {{ course.NUM_OF_STUDENTS }}  </h5></p>
+    <p ><h5 >Number of Courses: {{ course.RATTING }}  </h5></p>
+</div>
+<div class="line"></div>
+<div style="width:1300px; margin:0 auto;">
+    <p ><H3 class="text-center text-dark font-weight-bold">Course Instructors</H3> </p>
+    <div class="mt-5"></div>
+    <ul class="list-group list-group-flush">
+        {% for teacher in teachers %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  " onclick="window.location='/profile/{{teacher.USER_ID}}';" style="cursor:pointer;"  >
+            <div class="col-md-1">
+                <img src="{% static 'images/profile.jpg'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;">
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h4 style="color:#069">Name: {{teacher.NAME}}</h4>
+                    </div>
+    
+                 </div>
+                 <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">DESIGNATION : {{teacher.DESIGNATION}}</h6>
+                    </div>
+        
+                </div>
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Courses : {{teacher.COURSE_TAKEN}}</h6>
+                    </div>
+        
+                </div>             
+                
+            </div>
+          
+            </div>
+          </li>
+        {% endfor %}
+    </ul> 
+</div>
+<div class="line"></div>
+<div style="width:1300px; margin:0 auto;">
+    <p ><H3 class="text-center text-dark font-weight-bold">Course Topics</H3> </p>
+    <div class="mt-5"></div>
+    <ul class="list-group list-group-flush">
+        {% for topic in topics %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  ">
+            <div class="col-md-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <div class="row  pt-2" >
+                    <div class="col-6" >
+                        <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
+                    </div>
+    
+                 </div>       
+                 <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069"> {{topic.TOPIC_DESCRIPTIONS}}</h6>
+                    </div>
+        
+                </div>        
+            </div>
+          
+            </div>
+          </li>
+        {% endfor %}
+    </ul> 
 </div>
 {% endblock %}
 {% else %}
 {% block contain2 %}
-{{course}}
-{{role}}
+<div class="mt-5"></div>
+<div  style="width:400px; margin:0 auto;"> 
+    <img class="ml-5" src="{% static 'images/course_bg.png'%}" width="150px" >
+    <p ><h3  style="color:black">{{ course.TITLE }} </h3> </p>    
+    <p class="text-dark">{{ course.DESCRIPTIONS }} </p> 
+</div>
+<div class="mt-5"></div>
+<div  style="width:900px; margin:0 auto;">  
+    <p ><h5 >Students: {{ course.NUM_OF_STUDENTS }}  </h5></p>
+    <p ><h5 >Number of Courses: {{ course.RATTING }}  </h5></p>
+</div>
+<div class="line"></div>
+<div style="width:1300px; margin:0 auto;">
+    <p ><H3 class="text-center text-dark font-weight-bold">Course Instructors</H3> </p>
+    <div class="mt-5"></div>
+    <ul class="list-group list-group-flush">
+        {% for teacher in teachers %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  " onclick="window.location='/profile/{{teacher.USER_ID}}';" style="cursor:pointer;"  >
+            <div class="col-md-1">
+                <img src="{% static 'images/profile.jpg'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;">
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h4 style="color:#069">Name: {{teacher.NAME}}</h4>
+                    </div>
+    
+                 </div>
+                 <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">DESIGNATION : {{teacher.DESIGNATION}}</h6>
+                    </div>
+        
+                </div>
+                <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069">Courses : {{teacher.COURSE_TAKEN}}</h6>
+                    </div>
+        
+                </div>             
+                
+            </div>
+          
+            </div>
+          </li>
+        {% endfor %}
+    </ul> 
+</div>
+<div class="line"></div>
+<div style="width:1300px; margin:0 auto;">
+    <p ><H3 class="text-center text-dark font-weight-bold">Course Topics</H3> </p>
+    <div class="mt-5"></div>
+    <ul class="list-group list-group-flush">
+        {% for topic in topics %}
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  ">
+            <div class="col-md-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
+            </div>
+            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <div class="row  pt-2" >
+                    <div class="col-6" >
+                        <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
+                    </div>
+    
+                 </div>       
+                 <div class="row  pt-2" >
+                    <div class="col-6">
+                        <h6 style="color:#069"> {{topic.TOPIC_DESCRIPTIONS}}</h6>
+                    </div>
+        
+                </div>        
+            </div>
+          
+            </div>
+          </li>
+        {% endfor %}
+    </ul> 
+</div>
 {% endblock %}
 {% endif %}

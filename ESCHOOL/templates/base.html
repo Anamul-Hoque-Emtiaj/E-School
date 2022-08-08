@@ -14,6 +14,9 @@
     <link href="{% static 'css/style3.css' %}" rel="stylesheet">  
 
     <title>ESCHOOL</title>
+    {% block header %}
+                      
+    {% endblock %}
   </head>
   <body>
     <div >
@@ -104,7 +107,7 @@
           
           {% endif %}
         </header>
-        <div >
+        <div class="container-fluid banner">
           {% if 'userid' in request.session %}
             <div class="wrapper">
 
