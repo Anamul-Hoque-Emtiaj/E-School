@@ -13,6 +13,8 @@
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addLectureModal">
                 Add Lecture
             </button>
+            <form class="mx-4" action="{{tid}}/add_lecture" method="POST">
+                {% csrf_token %}
             <div class="modal fade" id="addLectureModal" tabindex="-1" aria-labelledby="addLectureModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -21,38 +23,39 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <form class="mx-4">
                           <div class="mb-2">
                             <label for="title">Title: </label>
-                            <input type="text" class="form-control" id="title">
+                            <input type="text" class="form-control" name="title" id="title">
                           </div>
                           <div class="mb-2">
                             <label for="link">Video Link: </label>
-                            <input type="text" class="form-control" id="link">
+                            <input type="text" class="form-control" name="link" id="link">
                           </div>
                           <div class="mb-2">
                             <label for="duration">Duration: </label>
-                            <input type="number" class="form-control" id="duration" value="0">
+                            <input type="number" class="form-control" name="duration" id="duration" value="0">
                           </div>
                           
                           <div class="mb-2">
                             <label for="description">Description: </label>
-                            <textarea class="form-control" id="description" rows="3">  </textarea>
+                            <textarea class="form-control" name="description" id="description" rows="3">  </textarea>
                           </div>
-                        </form>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
                       </div>
                     </div>
                 </div>
             </div>
+            </form>
         </div>
         <div class="col-2">
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addexamModal">
                 Add exam
             </button>
+            <form class="mx-4" action="{{tid}}/add_quiz" method="POST">
+                {% csrf_token %}
             <div class="modal fade" id="addexamModal" tabindex="-1" aria-labelledby="addexamModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -61,20 +64,19 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form class="p-4">
                                 <div class="mb-2">
                                     <label for="name">Exam Name: </label>
-                                    <input type="text" class="form-control" id="name" value="{{content.NAME}}">
+                                    <input type="text" class="form-control" name="title" id="name" value="{{content.NAME}}">
                                 </div>
-                            </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary">Save</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
+            </form>
         </div>
     </div>
     {% endif %}
@@ -85,6 +87,8 @@
     <ul class="list-group list-group-flush">
         {% for content in contents %}
         <!--Modal start-->
+        <form class="mx-4" action="{{tid}}/content/{{content.CONTENT_ID}}/edit_content" method="POST">
+            {% csrf_token %}
         <div class="modal fade" id="myModal-{{content.CONTENT_ID}}" tabindex="-1" aria-labelledby="myModalLabel-{{content.CONTENT_ID}}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -93,37 +97,35 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form class="p-4">
                             <div class="mb-2">
                                 <label for="name">Content Name: </label>
-                                <input type="text" class="form-control" id="name" value="{{content.NAME}}">
+                                <input type="text" class="form-control" name="title" value="{{content.NAME}}">
                             </div>
                             {% if content.TYPE == 'lecture' %}
                             <div class="mb-2">
                                 <label for="link">Video Link: </label>
-                                <input type="text" class="form-control" id="link" value="{{content.VIDEO_LINK}}">
+                                <input type="text" class="form-control" name="link" value="{{content.VIDEO_LINK}}">
                             </div>
 
                             <div class="mb-2">
                                 <label for="duration">Duration: </label>
-                                <input type="number" class="form-control" id="duration" value="{{content.DURATION}}">
+                                <input type="number" class="form-control" name="duration" value="{{content.DURATION}}">
                             </div>
                             
                             <div class="form-group mb-2">
                                 <label for="description">DESCRIPTION</label>
-                                <textarea class="form-control" id="description" rows="3"> {{content.DESCRIPTION}} </textarea>
+                                <textarea class="form-control" name="description" rows="3"> {{content.DESCRIPTION}} </textarea>
                             </div>
                             {% endif %}
-                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
         </div>
-
+        </form>
         <div class="modal fade" id="deleteContentModal-{{ content.CONTENT_ID }}" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -138,7 +140,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/delete';">
+                        Delete</button>
                 </div>
                 </div>
             </div>
@@ -158,12 +161,12 @@
                 {% if role == 'teacher' or role == 'contributer' %}
                 <div class="col" >
                     <div class="row " >
-                        <button type="button" class="btn btn-light">
+                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/up_content';">
                             <i class="fa-solid fa-arrow-up"></i>
                         </button>
                     </div>
                     <div class="row " >
-                        <button type="button" class="btn btn-light">
+                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/down_content';">
                             <i class="fa-solid fa-arrow-down"></i>
                         </button>
                     </div>

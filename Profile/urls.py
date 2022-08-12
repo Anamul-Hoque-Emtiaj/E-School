@@ -9,12 +9,12 @@ urlpatterns = [
     path('<int:user_id>/notification', views.notification, name='notification' ),
 
     #student's
-    path('<int:user_id>/enrolled_course', views.enrolled_course, name='enrolled_course' ),
     path('<int:user_id>/progress', views.progress, name='progress' ),
 
     #teacher's
-    path('<int:user_id>/taken_course', views.taken_course, name='taken_course' ),
     path('<int:user_id>/add_course', views.add_course, name='add_course' ),
+    path('<int:user_id>/edit_course/<int:course_id>', views.edit_course, name='edit_course' ),
+    path('<int:user_id>/delete_course/<int:course_id>', views.delete_course, name='delete_course' ),
 
 
     #admin

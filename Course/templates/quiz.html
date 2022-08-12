@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contain1 %}
+<div class="mt-5"></div>
+<div style="width:1300px; margin:0 auto;">
+    <div class="d-flex justify-content-center">
+        <h3>{{content.NAME}}</h3>
+    </div>
+    <div class="mt-5"></div>
+    
+    <div class="d-flex justify-content-between">
+        <h5>Questions: {{content.NUM_OF_QUESTIONS}}</h5>
+        <h5>Total Marks: {{content.MARKS}}</h5>
+    </div>
+    {% if role == 'teacher' or role == 'contributer' %}
+    <div class="mt-3"></div>
+    <div class="d-flex justify-content-left">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMcqModal">
+            Add MCQ
+        </button>
+        <form class="mx-4" action="{{content.CONTENT_ID}}/add_mcq" method="POST">
+          {% csrf_token %}
+        <div class="modal fade" id="addMcqModal" tabindex="-1" aria-labelledby="addMcqModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addMcqModal">Add New MCQ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="mb-2">
+                        <label for="question">Questions: </label>
+                        <input type="text" class="form-control" name="question">
+                      </div>
+                      <div class="mb-2">
+                        <label for="op1">Option 1: </label>
+                        <input type="text" class="form-control" name="op1">
+                      </div>
+                      <div class="mb-2">
+                        <label for="op2">Option 2: </label>
+                        <input type="text" class="form-control" name="op2">
+                      </div>
+                      <div class="mb-2">
+                        <label for="op3">Option 3: </label>
+                        <input type="text" class="form-control" name="op3">
+                      </div>
+                      <div class="mb-2">
+                        <label for="op4">Option 4: </label>
+                        <input type="text" class="form-control" name="op4">
+                      </div>
+                      <div class="mb-2">
+                        <label for="ra">Correct Option: </label>
+                        <select class="custom-select" name="ra">
+                            <option selected>Choose Correct Option</option>
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                            <option value="4">Option 4</option>
+                        </select>
+                      </div>
+                      <div class="mb-2">
+                        <label for="mark">Mark: </label>
+                        <input type="number" class="form-control" name="mark" value="1">
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+        </form>
+        <button type="button" class=" ml-5 btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addShortModal">
+            Add Short Question
+        </button>
+        <form class="mx-4" action="{{content.CONTENT_ID}}/add_short" method="POST">
+          {% csrf_token %}
+        <div class="modal fade" id="addShortModal" tabindex="-1" aria-labelledby="addShortModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addShortModal">Add New Short Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                        <div class="mb-2">
+                            <label for="question">Questions: </label>
+                            <input type="text" class="form-control" name="question">
+                        </div>
+                        <div class="mb-2">
+                            <label for="ra">Answer: </label>
+                            <input type="text" class="form-control" name="ra">
+                        </div>
+                        <div class="mb-2">
+                            <label for="mark">Mark: </label>
+                            <input type="number" class="form-control" name="mark" value="1">
+                        </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    {% endif %}
+    <div class="line"></div>
+    <ol>
+      {% for question in questions %}
+      <!--Modal start-->
+      <form class="mx-4" action="{{content.CONTENT_ID}}/edit_question/{{question.Q_ID}}" method="POST">
+        {% csrf_token %}
+      <div class="modal fade" id="myModal-{{question.Q_ID}}" tabindex="-1" aria-labelledby="myModalLabel-{{question.Q_ID}}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModal-{{question.Q_ID}}">Edit Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form class="mx-4">
+                    {% if question.TYPE == 'mcq' %}
+                    <div class="mb-2">
+                      <label for="question">Questions: </label>
+                      <input type="text" class="form-control" name="question" id="question" value="{{question.QUESTION}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="op1">Option 1: </label>
+                      <input type="text" class="form-control" name="op1" value="{{question.OP1}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="op2">Option 2: </label>
+                      <input type="text" class="form-control" name="op2" value="{{question.OP2}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="op3">Option 3: </label>
+                      <input type="text" class="form-control" name="op3" value="{{question.OP3}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="op4">Option 4: </label>
+                      <input type="text" class="form-control" name="op4" value="{{question.OP4}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="ra">Correct Option: </label>
+                      <select class="custom-select" name="ra">
+                          <option value="1" selected>Option 1</option>
+                          <option value="2">Option 2</option>
+                          <option value="3">Option 3</option>
+                          <option value="4">Option 4</option>
+                      </select>
+                    </div>
+                    <div class="mb-2">
+                      <label for="mark">Mark: </label>
+                      <input type="number" class="form-control" name="mark" value="{{question.NUM}}">
+                    </div>
+                    {% else %}
+                    <div class="mb-2">
+                      <label for="question">Questions: </label>
+                      <input type="text" class="form-control" name="question" value="{{question.Questions}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="ra">Answer: </label>
+                      <input type="text" class="form-control" name="ra" value="{{question.RA}}">
+                    </div>
+                    <div class="mb-2">
+                      <label for="mark">Mark: </label>
+                      <input type="number" class="form-control" name="mark" value="{{question.NUM}}">
+                    </div>
+                    {% endif %}
+                  
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+      </div>
+      </form>
+
+    <div class="modal fade" id="deleteContentModal-{{question.Q_ID}}" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteContentModal">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mx-4 text-dark">
+                    Are you sure want to Delete this Questions?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/delete_question/{{question.Q_ID}}';">Delete</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal ended-->
+      <div class="col-md-12" style="cursor:pointer;">
+      <li>
+          <!--b>{{question.Questions}}</b><br><br-->
+        <div class="row mb-4">
+          <div class="col-9">
+            <b>{{question.QUESTION}}</b>
+          </div>
+          {% if role == 'teacher' or role == 'contributer' %}
+          <div class="col" >
+            <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/up_question/{{question.Q_ID}}';">
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+          </div>
+          <div class="col" >
+              <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/down_question/{{question.Q_ID}}';">
+                  <i class="fa-solid fa-arrow-down"></i>
+              </button>
+          </div>
+          <div class="col" >
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-{{question.Q_ID}}">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            </button>
+            
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteContentModal-{{question.Q_ID}}">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+        </div>
+          {% endif %}
+        </div>
+        {% if question.TYPE == 'mcq' %}
+        <div class="row mx-2" >
+            <div class="col-md-3">
+              <input class="form-check-input" type="radio" name="q{{question.Q_ID}}" id="option1" value="option1"  >
+              <label for="option1">{{question.OP1}}</label> 
+            </div>
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="q{{question.Q_ID}}" id="option2" value="option2" >
+                <label for="option2">{{question.OP2}}</label> 
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="q{{question.Q_ID}}" id="option3" value="option3" >
+                <label for="option3">{{question.OP3}}</label> 
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="q{{question.Q_ID}}" id="option4" value="option4" >
+                <label class="success" for="option4">{{question.OP4}}</label> 
+            </div>
+            
+        </div>
+        {% else %}
+        <div class="row mx-2" >
+          <div class="col">
+            <input type="text" class="form-control" name="ans-{{question.Q_ID}}" id="answer">
+          </div>
+        </div>
+        {% endif %}
+      </li>
+      <br>
+      <hr>
+  </div>
+  {% endfor %}
+  </ol>
+    {% if role == 'estudent' %} 
+    <div class="mt-3"></div>
+    <div class="row  justify-content-end">
+        <div class="col-2">
+            <button class="btn btn-outline-primary btn-block mb-5" type="submit" value="Submit">Submit</button>
+        </div>
+        <div class="col-2">
+          <button class="btn btn-outline-primary btn-block mb-5" type="submit" value="Back">Back</button>
+      </div>
+    </div>
+    
+    {% endif %} 
+</div>
+
+{% endblock %}

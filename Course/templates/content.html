@@ -1,34 +1,29 @@
 {% extends 'base.html' %}
 {% load static %}
-{% if 'userid' in request.session %}
+
 {% block contain1 %}
 <div class="mt-5"></div>
-{% if content.VIDEO_LINK != NULL %}
+
 <div style="width:700px; margin:0 auto;">
+    {% if content.VIDEO_LINK != NULL %}
     <div class="ml-5">
         <iframe width="560" height="315" src={{content.VIDEO_LINK}} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
+    {% endif %}
     <div class="mt-2"></div>
     <p ><H3 class="text-center text-dark font-weight-bold">{{content.NAME}}</H3> </p>
     <div class="mt-5"></div>
-    <div class="row  ml-5">
-        <div class="col">
-            <button type="button" class="btn btn-dark">Prev</button>
-        </div>
-        <div class="col-5">
-            <button type="button" class="btn btn-success">Mark As Completed</button>
-        </div>
-        <div class="col">
-            <button type="button" class="btn btn-dark">Next</button>
-        </div>
+    <div class="d-flex justify-content-around">
+        <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/prev';">Prev</button>
+        {% if role == 'estudent' %}
+        <button type="button" class="btn btn-success" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/complete';">Mark As Completed</button>
+        {% endif %}
+        <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/next';">Next</button>
     </div>
 </div>
-{% else %}
-<div style="width:700px; margin:0 auto;">
-    <p ><H3 class="text-center text-dark font-weight-bold">{{content.NAME}}</H3> </p>
-</div>
+
 <div class="line"></div>
-{% endif %}
+
 <div class="mt-5"></div>
 <div style="width:1200px; margin:0 auto;">
     <p ><H3 class="text-dark font-weight-bold">DESCRIPTIONS</H3> </p>
@@ -38,4 +33,3 @@
 </div>
 
 {% endblock %}
-{% endif %}

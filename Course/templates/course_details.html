@@ -7,6 +7,12 @@
 <div class="mt-5"></div>
 <div  style="width:400px; margin:0 auto;"> 
     <img class="ml-5" src="{% static 'images/course_bg.png'%}" width="150px" >
+    {% if role == 'student' %}
+    <div class="ml-5 mt-3">
+        <button type="button" class="btn btn-primary ml-3" onclick="window.location='/course/{{course.COURSE_ID}}/enroll/{{request.session.userid}}';">
+            Enroll now</button>
+    </div>
+    {% endif %}
     <p ><h3  style="color:black">{{ course.TITLE }} </h3> </p>    
     <p class="text-dark">{{ course.DESCRIPTIONS }} </p> 
 </div>
@@ -19,35 +25,87 @@
 <div style="width:1300px; margin:0 auto;">
     <p ><H3 class="text-center text-dark font-weight-bold">Course Instructors</H3> </p>
     <div class="mt-5"></div>
+    {% if role == 'teacher' %}
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addInstructorModal">
+        Add Instructor
+    </button>
+    <form class="mx-4" action="{{course.COURSE_ID}}/add_instructor" method="POST">
+        {% csrf_token %}
+    <div class="modal fade" id="addInstructorModal" tabindex="-1" aria-labelledby="addInstructorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addInstructorModal">Add New Lecture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="mb-2">
+                    <label for="email">Instructor Email: </label>
+                    <input type="email" class="form-control" name="email" id="email">
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <div class="mt-3"></div>
+    {% endif %}
     <ul class="list-group list-group-flush">
         {% for teacher in teachers %}
-        <li class="list-group-item list-group-item-action shadow">
-            <div class="row  " onclick="window.location='/profile/{{teacher.USER_ID}}';" style="cursor:pointer;"  >
-            <div class="col-md-1">
-                <img src="{% static 'images/profile.jpg'%}" width="80px" style="border-radius: 50%;">
-            </div>
-            <div class="col-md-10 ml-4" style="padding-top: 0px;">
-                <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h4 style="color:#069">Name: {{teacher.NAME}}</h4>
+        <div class="modal fade" id="deleteContributer-{{teacher.USER_ID}}" tabindex="-1" aria-labelledby="deleteContributer-{{teacher.USER_ID}}Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteContributer-{{teacher.USER_ID}}">Confirm Remove</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-    
-                 </div>
-                 <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h6 style="color:#069">DESIGNATION : {{teacher.DESIGNATION}}</h6>
+                    <div class="modal-body">
+                        <p class="mx-4 text-dark">
+                            Are you sure want to Remove this Contributer?
+                        </p>
                     </div>
-        
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_instructor/{{teacher.USER_ID}}';">Delete</button>
+                    </div>
                 </div>
-                <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h6 style="color:#069">Courses : {{teacher.COURSE_TAKEN}}</h6>
-                    </div>
-        
-                </div>             
-                
             </div>
-          
+        </div>
+        <li class="list-group-item list-group-item-action shadow">
+            <div class="row  ">
+                <div class="col-md-1" onclick="window.location='/profile/{{teacher.USER_ID}}';" style="cursor:pointer;">
+                    <img src="{% static 'images/profile.jpg'%}" width="80px" style="border-radius: 50%;">
+                </div>
+                <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/profile/{{teacher.USER_ID}}';" style="cursor:pointer;">
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h4 style="color:#069">Name: {{teacher.NAME}}</h4>
+                        </div>
+        
+                    </div>
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h6 style="color:#069">DESIGNATION : {{teacher.DESIGNATION}}</h6>
+                        </div>
+                        <div class="col-6">
+                            <h6 style="color:#069">Courses : {{teacher.COURSE_TAKEN}}</h6>
+                        </div>
+            
+                    </div>             
+                    
+                </div>
+                {% if role == 'teacher' and  teacher.USER_ID != request.session.userid %}
+                <div class="col mt-3 ">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteContributer-{{teacher.USER_ID}}">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                   
+                </div>
+                {% endif %}
             </div>
           </li>
         {% endfor %}
@@ -57,27 +115,136 @@
 <div style="width:1300px; margin:0 auto;">
     <p ><H3 class="text-center text-dark font-weight-bold">Course Topics</H3> </p>
     <div class="mt-5"></div>
+    {% if role == 'teacher' or role == 'contributer' %}
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addTopicModal">
+        Add Topic
+    </button>
+    <form class="mx-4" action="{{course.COURSE_ID}}/add_topic" method="POST">
+        {% csrf_token %}
+    <div class="modal fade" id="addTopicModal" tabindex="-1" aria-labelledby="addTopicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addTopicModal">Add New Topic</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                    <div class="mb-2">
+                        <label for="name">Topic Name: </label>
+                        <input type="text" class="form-control" id="name" name="name" >
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="description">DESCRIPTION</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">  </textarea>
+                    </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <div class="mt-3"></div>
+    {% endif %}
     <ul class="list-group list-group-flush">
         {% for topic in topics %}
+        <!--Modal start-->
+        <form class="mx-4" action="{{course.COURSE_ID}}/edit_topic/{{topic.TOPIC_ID}}" method="POST">
+            {% csrf_token %}
+        <div class="modal fade" id="myModal-{{topic.TOPIC_ID}}" tabindex="-1" aria-labelledby="mmyModal-{{topic.TOPIC_ID}}Label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModal-{{topic.TOPIC_ID}}">Edit Content {{content.TYPE}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="mb-2">
+                                <label for="name">Topic Name: </label>
+                                <input type="text" class="form-control" name="name" id="name" value="{{topic.TOPIC_NAME}}">
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="description">DESCRIPTION</label>
+                                <textarea class="form-control" name="description" id="description" rows="3"> {{topic.TOPIC_DESCRIPTIONS}} </textarea>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+
+        <div class="modal fade" id="deleteContentModal-{{topic.TOPIC_ID}}" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteContentModal-{{topic.TOPIC_ID}}">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mx-4 text-dark">
+                        Are you sure want to Delete this Topic?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_topic/{{topic.TOPIC_ID}}';">Delete</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal ended-->
         <li class="list-group-item list-group-item-action shadow">
             <div class="row  ">
-            <div class="col-md-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
-                <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
-            </div>
-            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
-                <div class="row  pt-2" >
-                    <div class="col-6" >
-                        <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
+                <div class="col" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                    <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
+                </div>
+                {% if role == 'teacher' or role == 'contributer' %}
+                <div class="col" >
+                    <div class="row " >
+                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/up_topic/{{topic.TOPIC_ID}}';">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
                     </div>
-    
-                 </div>       
-                 <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h6 style="color:#069"> {{topic.TOPIC_DESCRIPTIONS}}</h6>
+                    <div class="row " >
+                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/down_topic/{{topic.TOPIC_ID}}';">
+                            <i class="fa-solid fa-arrow-down"></i>
+                        </button>
                     </div>
+                </div>
+                {% endif %}
+                <div class="col-md-8" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                    <div class="row  pt-2" >
+                        <div class="col-6" >
+                            <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
+                        </div>
         
-                </div>        
-            </div>
+                    </div>       
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h6 style="color:#069"> {{topic.TOPIC_DESCRIPTIONS}}</h6>
+                        </div>
+            
+                    </div>        
+                </div>
+                {% if role == 'teacher' or role == 'contributer' %}
+                <div class="col mt-3 " >
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-{{topic.TOPIC_ID}}">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    </button>
+                    
+                </div>
+                <div class="col mt-3 ">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteContentModal-{{topic.TOPIC_ID}}">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
+                {% endif %}
           
             </div>
           </li>
