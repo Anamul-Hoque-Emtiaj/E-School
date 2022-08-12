@@ -142,7 +142,7 @@
                           <a href="{% url 'profile' request.session.userid %}" >Dashboard</a>
                         </li>
                         <li>
-                          <a href="#">Approve student</a>
+                          <a href="{% url 'approve_student' request.session.userid %}">Approve student</a>
                         </li>
                         <li>
                             <a href="#">Settings</a>
@@ -156,16 +156,16 @@
                         </li>
                         
                         <li>
-                            <a href="{% url 'home'  %}">Approve course</a>
+                            <a href="{% url 'course_approval'  %}">Approve course</a>
                         </li>
                         <li>
-                            <a href="#">All Courses</a>
+                            <a href="{% url 'all_courses' 'asc' %}">All Courses</a>
                         </li>
                         <li>
-                          <a href="#">All Student</a>
+                          <a href="{% url 'all_students' %}">All Student</a>
                         </li>
                         <li>
-                        <a href="#">All Teacher</a>
+                        <a href="{% url 'all_teachers' %}">All Teacher</a>
                         </li>
             
                     </ul>

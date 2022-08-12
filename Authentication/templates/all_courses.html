@@ -4,6 +4,61 @@
 {% block contain1 %}
 <div class="mt-5"></div>
 <div  style="width:900px; margin:0 auto;"> 
+    {% if request.session.role == 'admin' %}
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Students</th>
+                <th scope="col">Ratting</th>
+                <th scope="col">DELETE Course</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <form class="mx-4" action="{% url 'delete_course' request.session.userid course.COURSE_ID %}" method="POST">
+                {% csrf_token %}
+            <div class="modal fade" id="removeModal{{course.COURSE_ID}}" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="removeModal{course.COURSE_ID}">Confirm Remove</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mx-4 text-dark">
+                            Are you sure want to Remove this Course?
+                        </p>
+                      
+                        <div class="mb-2">
+                          <label for="password">Password : </label>
+                          <input type="password" class="form-control" name="password" id="password">
+                        </div>
+                      
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Remove</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            </form>
+            <tr >
+                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.TITLE}}</td>
+                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.NUM_OF_STUDENTS}}</td>
+                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.RATTING}}</td>
+                <td>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeModal{{course.COURSE_ID}}">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
     <ul class="list-group list-group-flush">
         {% for course in courses %}
         {% if course.APPROVED == 1 %}
@@ -39,6 +94,7 @@
         {% endif %}
         {% endfor %}
     </ul> 
+    {% endif %}
 </div> 
 {% endblock %}
 {% else %}

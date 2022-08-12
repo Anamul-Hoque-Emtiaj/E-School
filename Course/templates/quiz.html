@@ -182,27 +182,27 @@
       </div>
       </form>
 
-    <div class="modal fade" id="deleteContentModal-{{question.Q_ID}}" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteContentModal">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mx-4 text-dark">
-                    Are you sure want to Delete this Questions?
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/delete_question/{{question.Q_ID}}';">Delete</button>
-            </div>
-            </div>
-        </div>
-    </div>
-    <!--Modal ended-->
-      <div class="col-md-12" style="cursor:pointer;">
+      <div class="modal fade" id="deleteContentModal-{{question.Q_ID}}" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="deleteContentModal">Confirm Delete</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <p class="mx-4 text-dark">
+                      Are you sure want to Delete this Questions?
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/delete_question/{{question.Q_ID}}';">Delete</button>
+              </div>
+              </div>
+          </div>
+      </div>
+      <!--Modal ended-->
+      <div class="col-md-12" >
       <li>
           <!--b>{{question.Questions}}</b><br><br-->
         <div class="row mb-4">
@@ -267,19 +267,7 @@
       <hr>
   </div>
   {% endfor %}
-  </ol>
-    {% if role == 'estudent' %} 
-    <div class="mt-3"></div>
-    <div class="row  justify-content-end">
-        <div class="col-2">
-            <button class="btn btn-outline-primary btn-block mb-5" type="submit" value="Submit">Submit</button>
-        </div>
-        <div class="col-2">
-          <button class="btn btn-outline-primary btn-block mb-5" type="submit" value="Back">Back</button>
-      </div>
-    </div>
-    
-    {% endif %} 
+    </ol>
 </div>
 
 {% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contain1 %}
+<div class="mt-5"></div>
+<div style="width:1300px; margin:0 auto;">
+    <div class="d-flex justify-content-center">
+        <h3>{{content.NAME}}</h3>
+    </div>
+    <div class="d-flex justify-content-center">
+        <h6>Status: {{status}}</h6>
+    </div>
+    <div class="mt-5"></div>
+    
+    <div class="d-flex justify-content-between">
+        <h5>Questions: {{content.NUM_OF_QUESTIONS}}</h5>
+        {% if status != 'pending' %}
+        <h5>Obtained Marks: {{obtainMark}}</h5>
+        {% endif %}
+        <h5>Total Marks: {{content.MARKS}}</h5>
+    </div>
+    <div class="line"></div>
+    <form class="mx-4" action="{{content.CONTENT_ID}}/give_exam" method="POST">
+      {% csrf_token %}
+    <ol>
+      {% for question in questions %}
+      <div class="col-md-12" >
+      <li>
+        <div class="row mb-4">
+          <div class="col-9">
+            <b>{{question.QUESTION}}</b>
+          </div>
+        </div>
+        {% if question.TYPE == 'mcq' %}
+        <div class="row mx-2" >
+            <div class="col-md-3">
+              <input class="form-check-input" type="radio" name="{{question.Q_ID}}" id="option1" value="1"  >
+              <label for="option1">{{question.OP1}}</label> 
+            </div>
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="{{question.Q_ID}}" id="option2" value="2" >
+                <label for="option2">{{question.OP2}}</label> 
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="{{question.Q_ID}}" id="option3" value="3" >
+                <label for="option3">{{question.OP3}}</label> 
+            </div>
+
+            <div class="col-md-3">
+                <input class="form-check-input" type="radio" name="{{question.Q_ID}}" id="option4" value="4" >
+                <label class="success" for="option4">{{question.OP4}}</label> 
+            </div>
+            
+        </div>
+        {% else %}
+        <div class="row mx-2" >
+          <div class="col">
+            <input type="text" class="form-control" name="{{question.Q_ID}}" id="answer">
+          </div>
+        </div>
+        {% endif %}
+      </li>
+      <br>
+      <hr>
+  </div>
+  {% endfor %}
+    </ol>
+    {% if role == 'estudent' %} 
+    <div class="mt-3"></div>
+    <div class="row  justify-content-end">
+        <div class="col-2">
+            {% if status != 'pending' %}
+            <button class="btn btn-outline-primary btn-block mb-5" type="submit">Submit Again</button>
+            {% else %}
+            <button class="btn btn-outline-primary btn-block mb-5" type="submit">Submit</button>
+            {% endif %}
+            
+        </div>
+    </div>
+    {% endif %} 
+    </form>
+</div>
+{% endblock %}

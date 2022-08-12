@@ -16,7 +16,11 @@
     <div class="d-flex justify-content-around">
         <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/prev';">Prev</button>
         {% if role == 'estudent' %}
+        {% if status == 'pending' %}
         <button type="button" class="btn btn-success" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/complete';">Mark As Completed</button>
+        {% else %}
+        <p class="text-dark font-weight-bold">Completed</p>
+        {% endif %}
         {% endif %}
         <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/next';">Next</button>
     </div>

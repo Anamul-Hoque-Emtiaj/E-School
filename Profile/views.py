@@ -136,9 +136,45 @@ def delete_course(request,user_id,course_id ):
                     c.execute('''DELETE From "Contribute" WHERE T_ID = %s and C_ID = %s''', [user_id,course_id])
             elif request.session["role"] == 'student':
                 c.execute('''DELETE FROM "Enrollment" WHERE COURSE_ID = %s AND S_ID = %s ''', [course_id,user_id])
+            else:
+                c.callproc("DELETE_COURSE",[course_id]) 
+                return redirect('/all_courses/asc')
     return redirect(profile,user_id)
+
+def approve_student(request,user_id):
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''SELECT (SELECT NAME FROM "Users" WHERE USER_ID = E.S_ID) NAME, (SELECT TITLE FROM "Courses" WHERE E.COURSE_ID = "Courses".COURSE_ID) TITLE, ENROLL_ID ID,S_ID,COURSE_ID
+                        FROM "Enrollment" E
+                        WHERE ISAPPROVED = 0 AND COURSE_ID IN ((SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s) UNION (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)) ''', [user_id,user_id])
+        enrollments = dictfetchall(c)
+        print(enrollments)
+    return render(request,'student_approval.html',{'enrollments':enrollments})
+
+def accept_student(request,user_id,course_id,s_id):
+    with connections['eschool_db'].cursor() as c:
+        c.callproc("APPROVED_STUDENT",[s_id,course_id])
+    return redirect('/profile/'+str(request.session["userid"])+'/approve_student')
+def reject_student(request,user_id,course_id,s_id):
+    with connections['eschool_db'].cursor() as c:
+        c.callproc("REEJECTED_STUDENT",[s_id,course_id])
+    return redirect('/profile/'+str(request.session["userid"])+'/approve_student')
+
 def course_approval(request):
-    return render(request,'course_approval.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''SELECT * FROM "Courses","Users" WHERE APPROVED = 0 AND "Courses".T_ID = USER_ID ''')
+        courses = dictfetchall(c)
+    return render(request,'course_approval.html',{'courses':courses})
+
+def accept_course(request,course_id):
+    with connections['eschool_db'].cursor() as c:
+        c.callproc('APPROVED_COURSE',[course_id])
+    return redirect('/profile/admin/course_approval')
+
+def reject_course(request,course_id):
+    with connections['eschool_db'].cursor() as c:
+        c.callproc('REEJECTED_COURSE',[course_id])
+            
+    return redirect('/profile/admin/course_approval')
 
 
 

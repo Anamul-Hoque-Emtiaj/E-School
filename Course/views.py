@@ -1,3 +1,4 @@
+from tokenize import Double
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -149,7 +150,13 @@ def content(request,course_id,topic_id,content_id):
                         ''', [content_id])
             content = dictfetchone(c)
             if content["TYPE"] == 'lecture':
-                return render(request,'content.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role})
+                status = 'pending'
+                c.execute('''SELECT COUNT(S_ID) CN FROM "Completion" WHERE S_ID = %s AND L_ID = %s
+                         ''', [request.session['userid'],content_id])
+                cur = dictfetchone(c)
+                if cur["CN"]>0:
+                    status = 'completed'
+                return render(request,'content.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role,'status':status})
             else:
                 c.execute('''SELECT * FROM
                         "Questions"
@@ -157,7 +164,25 @@ def content(request,course_id,topic_id,content_id):
                         ORDER BY SERIAL
                         ''', [content_id])
                 questions = dictfetchall(c)
-                return render(request,'quiz.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role,'questions':questions})
+                if role=='teacher' or role=='contributer' or role=='admin': 
+                    return render(request,'quiz.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role,'questions':questions})
+                else:
+                    status = 'pending'
+                    c.execute('''SELECT COUNT(S_ID) CN FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
+                         ''', [request.session['userid'],content_id])
+                    cur = dictfetchone(c)
+                    obtainMark = -1
+                    if cur["CN"]>0:
+                        c.execute('''SELECT OBTAINED_MARKS FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
+                         ''', [request.session['userid'],content_id])
+                        cur = dictfetchone(c)
+                        obtainMark = cur["OBTAINED_MARKS"]
+
+                        if obtainMark*2>=content["MARKS"]:
+                            status = 'completed'
+                        else:
+                            status = 'failed'
+                    return render(request,'give_exam.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role,'questions':questions,'obtainMark':obtainMark,'status':status})
         elif role=='student' or role=='pstudent':
             return redirect('/course/'+str(course_id)+'')
         else:
@@ -398,4 +423,34 @@ def up_question(request,course_id,topic_id,content_id,q_id):
 def down_question(request,course_id,topic_id,content_id,q_id):
     with connections['eschool_db'].cursor() as c:
         c.callproc('DOWN',[q_id,content_id,'Q'])
+    return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
+
+def give_exam(request,course_id,topic_id,content_id):
+    print(request.POST)
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''SELECT Q_ID,RA,NUM FROM
+                        "Questions"
+                        WHERE E_ID = %s
+                        ORDER BY SERIAL
+                        ''', [content_id])
+        questions = dictfetchall(c)
+        mark = 0
+        for question in questions:
+            temp = str(question["Q_ID"])
+            if request.POST[temp] == question["RA"]:
+                mark = mark + question["NUM"]
+        c.execute('''SELECT COUNT(S_ID) CN FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
+                        ''', [request.session["userid"],content_id])
+        en = dictfetchone(c)
+        if en["CN"]==0:
+            c.execute('''INSERT INTO "Take_Exams"(S_ID, E_ID, OBTAINED_MARKS) VALUES (%s,%s,%s)
+                        ''', [request.session["userid"],content_id,mark])
+        else:
+            c.execute('''SELECT OBTAINED_MARKS FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
+                        ''', [request.session["userid"],content_id])
+            en = dictfetchone(c)
+            pmark = en["OBTAINED_MARKS"]
+            if mark>pmark:
+                c.execute('''UPDATE "Take_Exams" SET OBTAINED_MARKS = %s WHERE S_ID = %s AND E_ID = %s
+                        ''', [mark,request.session["userid"],content_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))

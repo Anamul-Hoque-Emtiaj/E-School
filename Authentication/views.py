@@ -87,26 +87,56 @@ def logout(request):
 
 def all_teachers(request):
      with connections['eschool_db'].cursor() as c:
-        c.execute('SELECT * from "Users" Where USER_ID IN (SELECT T_ID from "Teachers") ')
+        c.execute('SELECT * from "Users","Teachers" Where USER_ID = T_ID order by COURSE_TAKEN desc ')
         users=dictfetchall(c)       
         return render(request,'all_teachers.html',{'users':users}) 
 
 def all_students(request):
     with connections['eschool_db'].cursor() as c:
-        c.execute('SELECT * from "Users" Where USER_ID IN (SELECT S_ID from "Students") ')
+        c.execute('SELECT * from "Users","Students" Where USER_ID = S_ID ')
         users=dictfetchall(c)       
     return render(request,'all_students.html',{'users':users}) 
 
 def all_courses(request,sortedBy):
     with connections['eschool_db'].cursor() as c:
-        c.execute('SELECT * from "Courses" ')
-        courses=dictfetchall(c)       
+        if sortedBy == 'popular':
+            c.execute('SELECT * from "Courses" ORDER BY NUM_OF_STUDENTS DESC')
+            courses=dictfetchall(c)  
+        elif sortedBy == 'toprated':
+            c.execute('SELECT * from "Courses" ORDER BY RATTING DESC')
+            courses=dictfetchall(c)
+        else:      
+            c.execute('SELECT * from "Courses" ')
+            courses=dictfetchall(c)
     return render(request,'all_courses.html',{'courses':courses}) 
+
+def delete_user(request,user_id):
+    with connections['eschool_db'].cursor() as c:
+        pas = request.POST["password"]
+        c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [request.session["userid"]])
+        upas = dictfetchone(c)
+        if pas == upas["PASSWORD"]:
+            c.execute('SELECT COUNT(S_ID) CN FROM "Students" WHERE S_ID = %s ',[user_id])
+            stu=dictfetchone(c)
+            c.callproc("DELETE_USER",[user_id])
+            if stu["CN"]>0:
+                return redirect(all_students)
+            else:
+                return redirect(all_teachers)
+        return redirect(all_students)
 
 def search_courses(request):
     if request.method=='POST':
-        print(request.POST['search'])
-        return  redirect('/')
-    else:
-         return  redirect('/')
+        searchkey = request.POST['search']
+        with connections['eschool_db'].cursor() as c:
+            c.execute('''SELECT * FROM "Courses","Users" WHERE USER_ID = T_ID AND COURSE_ID IN (
+                        (SELECT C.COURSE_ID FROM "Courses" C WHERE C.TITLE LIKE '%%s%' OR C.DESCRIPTIONS LIKE '%%s%')
+                        UNION
+                        (SELECT C_ID FROM "Contribute"  WHERE "Contribute".T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE U.NAME LIKE '%%s%' OR U.EMAIL LIKE %%s%)
 
+                        )
+                        UNION
+                        (SELECT C1.COURSE_ID FROM "Courses" C1  WHERE C1.T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE U.NAME LIKE '%%s%' OR U.EMAIL LIKE %%s%)
+                        )) ''', [request.session["userid"]])
+            courses=dictfetchall(c)
+        return render(request,'all_courses.html',{'courses':courses}) 
