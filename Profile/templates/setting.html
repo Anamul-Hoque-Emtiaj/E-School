@@ -1,6 +1,54 @@
 {% extends 'base.html' %}
-{% block contain %}
-<div class="container">
-    from setting
+{% load static %}
+
+{% block contain1 %}
+<div class="mt-5"></div>
+<div style="width:1200px; margin:0 auto;"> 
+    <p ><h4 class="text-dark font-weight-bold text-center">Change Info  </h4></p>
+    <div class="line"></div>
+    <form action="{% url 'edit_info' request.session.userid %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" name="name" id="name"  placeholder="Enter Name" value="{{user.NAME}}">
+        </div>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" name="email" id="email"  placeholder="Enter email" value="{{user.EMAIL}}">
+        </div>
+        {% if request.session.role == 'teacher' %}
+        <div class="form-group">
+            <label for="designation">Designation</label>
+            <input type="text" class="form-control" name="designation" id="designation"  placeholder="Designation" value="{{user.DESIGNATION}}">
+        </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+      <div class="line"></div>
+      <p ><h4 class="text-dark font-weight-bold text-center">Change Password  </h4></p>
+      <form action="{% url 'change_password' request.session.userid %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="npassword">New Password</label>
+          <input type="password" class="form-control" name="npassword" id="npassword" placeholder="New Password" >
+        </div>
+
+        <div class="form-group">
+            <label for="cpassword">Confirm Password</label>
+            <input type="password" class="form-control" name="cpassword" id="cpassword" placeholder="Confirm Password" >
+        </div>
+
+        <div class="form-group">
+            <label for="opassword">Old Password</label>
+            <input type="password" class="form-control" name="opassword" id="opassword" placeholder="Old Password" >
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
 </div>
 {% endblock %}

@@ -6,6 +6,8 @@ urlpatterns = [
     #common
     path('<int:user_id>', views.profile, name='profile' ),
     path('<int:user_id>/setting', views.setting, name='setting' ),
+    path('<int:user_id>/edit_info', views.edit_info, name='edit_info' ),
+    path('<int:user_id>/change_password', views.change_password, name='change_password' ),
     path('<int:user_id>/notification', views.notification, name='notification' ),
 
     #student's

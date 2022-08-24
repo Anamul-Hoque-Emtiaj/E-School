@@ -1,14 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
 {% if 'userid' in request.session %}
+{% block header %}
+<style>
+    body {
+      
+     
+    }
+
+    .heading h1 {
+      text-align: center;
+      font-size: 80px;
+      color: rgb(16, 225, 236);
+      margin-top: 60px;
+     
+     
+
+    }
+    .heading h4 {
+      text-align: center;
+      font-size: 40px;
+      color: rgb(246, 235, 235);
+      margin-top: 10px;
+      margin-bottom: 150px;
+      font-style: italic;
+     
+
+    }
+
+    .heading h2 {
+      text-align: center;
+      font-size: 60px;
+      color: black;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      margin-left: 300px auto;
+      margin-right: 300px auto;
+
+    }
+    .heading h3 {
+      text-align: end;
+      font-size: 20px;
+      color: rgb(240, 236, 245); 
+      margin-bottom: 5px;
+      margin-right: 45px;
+
+    }
+
+    .row {
+      margin: 5px;
+      
+    }
+
+    #features {
+      padding: 2%;
+      border: 10px;
+    }
+    #features1{
+      padding: 2%;
+     
+      border: 10px;
+      background-image: url('{% static "/images/BG2.png" %}');
+      background-size: 1520px 720px;
+    }
+
+    .features {
+      border: 1px solid red;
+      padding: 5px;
+      border-radius: 5px;
+      margin: 8px;
+      transition: 0.5s;
+      background: rgb(62, 169, 179);
+    }
+
+    .features:hover {
+      transform: scale(1.1);
+      box-shadow: 2px 6px 5px;
+    }
+
+    .icon-style {
+      background: rgb(82, 174, 240);
+      padding: 15px;
+      margin: 5px;
+
+    }
+
+    .features p {
+      font-size: 20px;
+      color: black;
+    }
+   
+  </style>
+{% endblock %}
 {% block contain1 %}
-<div class="container mb-5">
-    from home Lorem ipsum dolor sit amet consectetur adipisicing elit. Non sunt delectus ad nam inventore nulla porro tenetur laborum repellat molestiae, vitae reprehenderit harum aliquam dolores, quis voluptas id laboriosam. Est.
+<section id="features1" class="text-center">
+    <div class="heading sm-12">
+      <h1>ESCHOOL</h1>
+      
+      <h4 class="text-center">Best Education From Home</h4>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-graduation-cap fa-5x icon-style rounded-circle"></i>
+          <h1>Online Courses</h1>
+          <p>
+            Best Online Courses From The Best Teachers.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-youtube-play fa-5x icon-style rounded-circle"></i>
+          <h1>Video Tutorials</h1>
+          <p>
+            Video Lectures of Each Topics that will Help You to Make Your Concept Clear
+          </p>
+        </div>
+
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-pencil-square-o fa-5x icon-style rounded-circle"></i>
+          <h1>MCQ Exams</h1>
+          <p>
+            After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+</section>
+<div class="line"></div>
+<div class="heading">
+    <h2>Top Rated Courses</h2>
 </div>
+<section id="features" class="text-center">
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-12">
+            <div class="features">
+                <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+              <h1>DSA</h1>
+  
+            </div>
+  
+          </div>
+    </div>
+</section>
+<div class="line"></div>
 {% endblock %}
 {% else %}
 {% block contain2 %}
-<div class="container p-4 m-5">
-    from home
+<section id="features1" class="text-center">
+    <div class="heading sm-12">
+      <h1>ESCHOOL</h1>
+      
+      <h4 class="text-center">Best Education From Home</h4>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-graduation-cap fa-5x icon-style rounded-circle"></i>
+          <h1>Online Courses</h1>
+          <p>
+            Best Online Courses From The Best Teachers.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-youtube-play fa-5x icon-style rounded-circle"></i>
+          <h1>Video Tutorials</h1>
+          <p>
+            Video Lectures of Each Topics that will Help You to Make Your Concept Clear
+          </p>
+        </div>
+
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="features">
+          <i id="cap" class="fa fa-pencil-square-o fa-5x icon-style rounded-circle"></i>
+          <h1>MCQ Exams</h1>
+          <p>
+            After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+</section>
+<div class="heading">
+    <h2>Top Rated Courses</h2>
 </div>
 {% endblock %}
 {% endif %}

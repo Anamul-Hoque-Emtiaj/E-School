@@ -129,10 +129,10 @@
                             <a href="{% url 'profile' request.session.userid %}" >Dashboard</a>
                         </li>
                         <li>
-                            <a href="#">Progress</a>
+                            <a href="{% url 'progress' request.session.userid %}">Progress</a>
                         </li>
                         <li>
-                            <a href="#">Settings</a>
+                            <a href="{% url 'setting' request.session.userid %}">Settings</a>
                         </li>
                     </ul>
                     {% elif request.session.role == "teacher" %}
@@ -145,7 +145,7 @@
                           <a href="{% url 'approve_student' request.session.userid %}">Approve student</a>
                         </li>
                         <li>
-                            <a href="#">Settings</a>
+                            <a href="{% url 'setting' request.session.userid %}">Settings</a>
                         </li>
                     </ul>
                     {% elif request.session.role == "admin" %}

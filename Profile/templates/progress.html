@@ -1,6 +1,64 @@
 {% extends 'base.html' %}
-{% block contain %}
-<div class="container">
-    from progress
+{% load static %}
+
+{% block contain1 %}
+{% if request.session.role == 'student' %}
+<div class="mt-5"></div>
+<div style="width:900px; margin:0 auto;"> 
+    <p ><h2 class="text-center text-dark font-weight-bold">Progress  </h2></p>
+    <div class="mt-5"></div>
+    <div id="accordion">
+        {% for course in courses %}
+        <div class="card">
+          <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+              <button class="btn btn-light" data-toggle="collapse" data-target="#collapseOne{{course.COURSE_ID}}" aria-expanded="false" aria-controls="collapseOne{{course.COURSE_ID}}">
+                {{course.TITLE}}
+              </button>
+            </h5>
+          </div>
+          <div id="collapseOne{{course.COURSE_ID}}" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+                <p class="mt-2 text-dark font-weight-bold">Progress:</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{course.PROGRESS}}%;"  aria-valuenow="{{course.PROGRESS}}" aria-valuemin="0" aria-valuemax="100">{{course.PROGRESS}}%</div>
+                </div>
+                <div class="mt-2"></div>
+                <p class="mt-2 text-dark font-weight-bold">Average Marks:</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{course.AVG_MARK}}%;" aria-valuenow="{{course.AVG_MARK}}" aria-valuemin="0" aria-valuemax="100">{{course.AVG_MARK}}%</div>
+                </div>
+                <p class="mt-2 text-dark font-weight-bold">Quiz's Marks:</p>
+                <table class="table table-hover">
+                  <thead class="thead-dark">
+                      <tr>
+                          <th scope="col">Title</th>
+                          <th scope="col">Questions</th>
+                          <th scope="col">Total Marks</th>
+                          <th scope="col">Obtained Marks</th>
+                         
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for exam in exams %}
+                      {% if exam.C_ID == course.COURSE_ID %}
+                      <tr onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{exam.TOPIC_ID}}/content/{{exam.E_ID}}';">
+                          <td>{{exam.NAME}}</td>
+                          <td>{{exam.NUM_OF_QUESTIONS}}</td>
+                          <td>{{exam.MARKS}}</td>
+                          <td>{{exam.OBTAINED_MARKS}}</td>
+                          
+                      </tr>
+                      {% endif %}
+                      {% endfor %}
+                  </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        
+    </div>
 </div>
+{% endif %}
 {% endblock %}

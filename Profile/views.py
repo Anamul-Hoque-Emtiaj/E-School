@@ -1,3 +1,4 @@
+import email
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -60,16 +61,68 @@ def profile(request,user_id):
     else:
         return render(request,'login.html',{'error':'Invalid UserID'})
 
-
 def setting(request,user_id):
-    return render(request,'setting.html')
+    with connections['eschool_db'].cursor() as c:
+        if request.session["role"] == "student":
+            c.execute('''select * from "Users" join "Students" S on "Users".USER_ID = S.S_ID WHERE USER_ID = %s ''', [user_id])
+        else:
+            c.execute('''select * from "Users" JOIN "Teachers" T on "Users".USER_ID = T.T_ID WHERE USER_ID = %s ''', [user_id])
+        user = dictfetchone(c)
+    return render(request,'setting.html',{'user':user})
+
+def change_password(request,user_id):
+    if request.method=='POST':
+        npas = request.POST["npassword"]
+        cpas = request.POST["cpassword"]
+        if npas == cpas:
+            with connections['eschool_db'].cursor() as c:
+                pas = request.POST["opassword"]
+                c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
+                upas = dictfetchone(c)
+                if pas == upas["PASSWORD"]:
+                    c.execute('''UPDATE "Users" SET PASSWORD = %s WHERE USER_ID = %s ''', [npas,user_id])
+    return redirect(setting,user_id)
+
+def edit_info(request,user_id):
+    if request.method=='POST':
+        with connections['eschool_db'].cursor() as c:
+            pas = request.POST["password"]
+            c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
+            upas = dictfetchone(c)
+            if pas == upas["PASSWORD"]:
+                eml = request.POST["email"]
+                c.execute('''SELECT COUNT(EMAIL) CN FROM "Users" WHERE USER_ID <> %s AND EMAIL = %s''', [user_id,eml])
+                cnt = dictfetchone(c)
+                if cnt["CN"] == 0:
+                    name = request.POST["name"]
+                    c.execute('''UPDATE "Users" SET NAME = %s ,EMAIL = %s WHERE USER_ID = %s''', [name,eml,user_id])
+                    if request.session["role"] == "teacher":
+                        designation = request.POST["designation"]
+                        c.execute('''UPDATE "Teachers" SET DESIGNATION = %s WHERE T_ID = %s''', [designation,user_id])
+    return redirect(setting,user_id)
 
 
 def notification(request,user_id):
     return render(request,'notification.html')
 
 def progress(request,user_id):
-    return render(request,'progress.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''SELECT E.COURSE_ID COURSE_ID
+                    FROM "Courses" C, "Enrollment" E
+                    WHERE C."COURSE_ID" = E."COURSE_ID" AND E."S_ID"=%s ''', [user_id])
+        C_ID = dictfetchall(c)
+        print(C_ID)
+        for cid in C_ID:
+            print(cid["COURSE_ID"])
+            c.callproc('UPDATE_PROGRESS',[user_id,cid["COURSE_ID"]])
+        c.execute('''SELECT *
+                    FROM "Courses" C, "Enrollment" E
+                    WHERE C."COURSE_ID" = E."COURSE_ID" AND E."S_ID"=%s ''', [user_id])
+        courses = dictfetchall(c)
+        c.execute('''SELECT * FROM "Quizs" JOIN "Contents" C2 on C2.CONTENT_ID = "Quizs".E_ID JOIN "Take_Exams" USING (E_ID) WHERE S_ID = %s ''', [user_id])
+        exams = dictfetchall(c)
+        print(exams)
+    return render(request,'progress.html',{'courses':courses,'exams':exams})
 
 
 def add_course(request,user_id):

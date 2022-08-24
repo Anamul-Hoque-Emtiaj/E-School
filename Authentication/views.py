@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 import string
 import cx_Oracle
 from django.db import connections
@@ -128,15 +127,17 @@ def delete_user(request,user_id):
 def search_courses(request):
     if request.method=='POST':
         searchkey = request.POST['search']
+        lst = [searchkey]
+        print(searchkey,lst)
         with connections['eschool_db'].cursor() as c:
-            c.execute('''SELECT * FROM "Courses","Users" WHERE USER_ID = T_ID AND COURSE_ID IN (
-                        (SELECT C.COURSE_ID FROM "Courses" C WHERE C.TITLE LIKE '%%s%' OR C.DESCRIPTIONS LIKE '%%s%')
-                        UNION
-                        (SELECT C_ID FROM "Contribute"  WHERE "Contribute".T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE U.NAME LIKE '%%s%' OR U.EMAIL LIKE %%s%)
+            c.execute('''SELECT * FROM "Courses" WHERE COURSE_ID IN (
+            (SELECT CX.COURSE_ID FROM "Courses" CX WHERE UPPER(CX.TITLE) LIKE UPPER(%s) OR UPPER(CX.DESCRIPTIONS) LIKE  UPPER(%s))
+            UNION
+            (SELECT C_ID FROM "Contribute"  WHERE "Contribute".T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
 
-                        )
-                        UNION
-                        (SELECT C1.COURSE_ID FROM "Courses" C1  WHERE C1.T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE U.NAME LIKE '%%s%' OR U.EMAIL LIKE %%s%)
-                        )) ''', [request.session["userid"]])
+            )
+            UNION
+            (SELECT C1.COURSE_ID FROM "Courses" C1  WHERE C1.T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
+            )) ''', [searchkey])
             courses=dictfetchall(c)
         return render(request,'all_courses.html',{'courses':courses}) 
