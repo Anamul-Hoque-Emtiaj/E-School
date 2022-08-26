@@ -10,7 +10,14 @@ from Utils.fetcher import *
 
 # Create your views here.
 def home(request):
-    return render(request,'home.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('SELECT * FROM "Courses" WHERE APPROVED = 1 ORDER BY RATTING DESC,NUM_OF_STUDENTS DESC,COURSE_ID ASC ')
+        course1=dictfetchall(c)
+        c.execute('SELECT * FROM "Courses" WHERE APPROVED = 1 ORDER BY NUM_OF_STUDENTS DESC,RATTING DESC,COURSE_ID ASC ')
+        course2=dictfetchall(c)
+        c.execute('SELECT * from "Users","Teachers" Where USER_ID = T_ID order by COURSE_TAKEN desc,T_ID ASC ')
+        teachers=dictfetchall(c) 
+    return render(request,'home.html',{'course1':course1,'course2':course2,'teachers':teachers})
 
 def login(request):
     if request.method=='POST':
@@ -86,7 +93,7 @@ def logout(request):
 
 def all_teachers(request):
      with connections['eschool_db'].cursor() as c:
-        c.execute('SELECT * from "Users","Teachers" Where USER_ID = T_ID order by COURSE_TAKEN desc ')
+        c.execute('SELECT * from "Users","Teachers" Where USER_ID = T_ID order by COURSE_TAKEN desc,T_ID ASC ')
         users=dictfetchall(c)       
         return render(request,'all_teachers.html',{'users':users}) 
 
@@ -99,13 +106,13 @@ def all_students(request):
 def all_courses(request,sortedBy):
     with connections['eschool_db'].cursor() as c:
         if sortedBy == 'popular':
-            c.execute('SELECT * from "Courses" ORDER BY NUM_OF_STUDENTS DESC')
+            c.execute('SELECT * FROM "Courses" ORDER BY NUM_OF_STUDENTS DESC,RATTING DESC,COURSE_ID ASC ')
             courses=dictfetchall(c)  
         elif sortedBy == 'toprated':
-            c.execute('SELECT * from "Courses" ORDER BY RATTING DESC')
+            c.execute('SELECT * FROM "Courses" ORDER BY RATTING DESC,NUM_OF_STUDENTS DESC,COURSE_ID ASC ')
             courses=dictfetchall(c)
         else:      
-            c.execute('SELECT * from "Courses" ')
+            c.execute('SELECT * from "Courses" ORDER BY COURSE_ID ASC')
             courses=dictfetchall(c)
     return render(request,'all_courses.html',{'courses':courses}) 
 
@@ -126,18 +133,18 @@ def delete_user(request,user_id):
 
 def search_courses(request):
     if request.method=='POST':
-        searchkey = request.POST['search']
-        lst = [searchkey]
-        print(searchkey,lst)
+        tmp = request.POST['search']
+        searchkey = '%' + tmp + '%'
         with connections['eschool_db'].cursor() as c:
             c.execute('''SELECT * FROM "Courses" WHERE COURSE_ID IN (
-            (SELECT CX.COURSE_ID FROM "Courses" CX WHERE UPPER(CX.TITLE) LIKE UPPER(%s) OR UPPER(CX.DESCRIPTIONS) LIKE  UPPER(%s))
-            UNION
-            (SELECT C_ID FROM "Contribute"  WHERE "Contribute".T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
+                (SELECT CF.COURSE_ID FROM "Courses" CF WHERE UPPER(CF.TITLE) LIKE UPPER(%s) OR UPPER(CF.DESCRIPTIONS) LIKE  UPPER(%s))
+                UNION
+                (SELECT C_ID FROM "Contribute"  WHERE "Contribute".T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
 
-            )
-            UNION
-            (SELECT C1.COURSE_ID FROM "Courses" C1  WHERE C1.T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
-            )) ''', [searchkey])
+                )
+                UNION
+                (SELECT C1.COURSE_ID FROM "Courses" C1  WHERE C1.T_ID IN ( SELECT U.USER_ID FROM "Users" U WHERE UPPER(U.NAME) LIKE UPPER(%s) OR UPPER(U.EMAIL) LIKE UPPER(%s))
+                )) ''',[searchkey,searchkey,searchkey,searchkey,searchkey,searchkey])
             courses=dictfetchall(c)
-        return render(request,'all_courses.html',{'courses':courses}) 
+            print(courses)
+    return render(request,'search_courses.html',{'courses':courses}) 

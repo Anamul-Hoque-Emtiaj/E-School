@@ -24,6 +24,9 @@ def course_details(request,course_id):
             teachers = dictfetchall(c)
             c.execute('''SELECT * FROM "Topics" WHERE COURSE_ID = %s ORDER BY SERIAL''', [course_id])
             topics = dictfetchall(c)
+            c.execute('''SELECT * FROM "Feedback" join "Users" ON S_ID = USER_ID WHERE C_ID = %s''', [course_id])
+            reviews = dictfetchall(c)
+            feedback = 'no'
             if request.session.has_key('userid'):
                 if request.session['role']=="teacher":
                     c.execute('''SELECT COUNT(COURSE_ID) CN FROM "Courses"
@@ -49,6 +52,13 @@ def course_details(request,course_id):
                         en = dictfetchone(c)
                         if en["ISAPPROVED"]==1:
                             role = 'estudent'
+                            c.execute('''SELECT COUNT(S_ID) CN FROM "Feedback" WHERE C_ID = %s AND S_ID = %s ''', 
+                                    [course_id,request.session['userid']])
+                            cn = dictfetchone(c)
+                            if cn["CN"]==0:
+                                feedback = 'yes'
+                            else:
+                                feedback = 'done'
                         else:
                             role = 'pstudent'
                     else:
@@ -57,14 +67,41 @@ def course_details(request,course_id):
                     role = 'none' 
             else:
                 role = 'none'
-            return render(request,'course_details.html',{'course':course,'role':role,'teachers':teachers,'topics':topics})
+            return render(request,'course_details.html',{'course':course,'role':role,'teachers':teachers,'topics':topics,'reviews':reviews,'feedback':feedback})
         else:
             return redirect('/profile/'+str(course["T_ID"])+'')
-def review(request,course_id):
-    return render(request,'review.html')
 
 def forum(request,course_id):
-    return render(request,'forum.html')
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''SELECT * FROM "Forums" JOIN "Users" U on U.USER_ID = "Forums".U_ID WHERE C_ID = %s ORDER BY F_ID DESC
+                    ''', [course_id])
+        comments = dictfetchall(c)
+    return render(request,'forum.html',{'comments':comments,'cid':course_id})
+def add_comment(request,course_id):
+    des = request.POST["comment_text"]
+    print(des)
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''INSERT INTO "Forums"(C_ID, U_ID, DESCRIPTION) VALUES (%s,%s,%s)
+                    ''', [course_id,request.session["userid"],des])
+    return redirect('/course/'+str(course_id)+'/forum')
+def add_reply(request,course_id,forum_id):
+    des = request.POST["reply"]
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''INSERT INTO "Forums"(C_ID, U_ID, PAR_COM_ID, DESCRIPTION) VALUES (%s,%s,%s,%s)
+                    ''', [course_id,request.session["userid"],forum_id,des])
+        c.execute('''UPDATE "Forums" SET CHILD = CHILD + 1 WHERE F_ID = %s
+                    ''', [forum_id])
+    return redirect('/course/'+str(course_id)+'/forum')
+def edit_comment(request,course_id,forum_id):
+    des = request.POST["description"]
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''UPDATE "Forums" SET DESCRIPTION = %s WHERE F_ID = %s
+                    ''', [des,forum_id])
+    return redirect('/course/'+str(course_id)+'/forum')
+def delete_comment(request,course_id,forum_id):
+    with connections['eschool_db'].cursor() as c:
+        c.callproc("DELETE_FORUM",[forum_id])
+    return redirect('/course/'+str(course_id)+'/forum')
 
 def topic(request,course_id,topic_id):
     with connections['eschool_db'].cursor() as c:
@@ -454,3 +491,29 @@ def give_exam(request,course_id,topic_id,content_id):
                 c.execute('''UPDATE "Take_Exams" SET OBTAINED_MARKS = %s WHERE S_ID = %s AND E_ID = %s
                         ''', [mark,request.session["userid"],content_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
+
+def add_review(request,course_id):
+    if request.method=='POST':
+        ratting = request.POST["ratting"]
+        review = request.POST["review"]
+        with connections['eschool_db'].cursor() as c:
+            c.execute('''INSERT INTO "Feedback"(S_ID, C_ID, RATTING, REVIEW) VALUES (%s,%s,%s,%s)
+                        ''', [request.session["userid"],course_id,ratting,review])
+            c.callproc("UPDATE_RATTING",[course_id])
+    return redirect('/course/'+str(course_id)+'')
+def edit_review(request,course_id):
+    if request.method=='POST':
+        ratting = request.POST["ratting"]
+        review = request.POST["review"]
+        with connections['eschool_db'].cursor() as c:
+            c.execute('''UPDATE "Feedback" SET RATTING = %s, REVIEW = %s WHERE S_ID = %s AND C_ID = %s
+                        ''', [ratting,review,request.session["userid"],course_id])
+            c.callproc("UPDATE_RATTING",[course_id])
+    return redirect('/course/'+str(course_id)+'')
+def delete_review(request,course_id):
+    print("Delete_review",request.session["userid"],course_id)
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''DELETE FROM "Feedback" WHERE S_ID = %s AND C_ID = %s
+                    ''', [request.session["userid"],course_id])
+        c.callproc("UPDATE_RATTING",[course_id])
+    return redirect('/course/'+str(course_id)+'')

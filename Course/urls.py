@@ -6,8 +6,6 @@ app_name = 'course'
 
 urlpatterns = [
     path('<int:course_id>', views.course_details, name='course_details'),
-    path('<int:course_id>/review', views.review, name='review'),
-    path('<int:course_id>/forum', views.forum, name='forum'),
     path('<int:course_id>/topic/<int:topic_id>', views.topic, name='topic'),
     path('<int:course_id>/topic/<int:topic_id>/content/<int:content_id>', views.content, name='content'),
 
@@ -42,4 +40,13 @@ urlpatterns = [
 
     path('<int:course_id>/add_instructor', views.add_instructor, name='add_instructor'),
     path('<int:course_id>/remove_instructor/<int:user_id>', views.remove_instructor, name='remove_instructor'),
+    path('<int:course_id>/add_review', views.add_review, name='add_review'),
+    path('<int:course_id>/edit_review', views.edit_review, name='edit_review'),
+    path('<int:course_id>/delete_review', views.delete_review, name='delete_review'),
+
+    path('<int:course_id>/forum', views.forum, name='forum'),
+    path('<int:course_id>/forum/add_comment', views.add_comment, name='add_comment'),
+    path('<int:course_id>/forum/add_reply/<int:forum_id>', views.add_reply, name='add_reply'),
+    path('<int:course_id>/forum/edit_comment/<int:forum_id>', views.edit_comment, name='edit_comment'),
+    path('<int:course_id>/forum/delete_comment/<int:forum_id>', views.delete_comment, name='delete_comment'),
 ]

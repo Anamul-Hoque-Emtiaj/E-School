@@ -41,7 +41,7 @@
     .heading h3 {
       text-align: end;
       font-size: 20px;
-      color: rgb(240, 236, 245); 
+      color: black;
       margin-bottom: 5px;
       margin-right: 45px;
 
@@ -86,8 +86,19 @@
     }
 
     .features p {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 500px;
       font-size: 20px;
       color: black;
+    }
+    .features h5 {
+      font-size: 20px;
+      font-weight: normal;
+      color: black;
+      padding: 2px;
+      margin: 2px;
     }
    
   </style>
@@ -103,10 +114,10 @@
       <div class="col-lg-4 col-md-4 col-sm-12">
         <div class="features">
           <i id="cap" class="fa fa-graduation-cap fa-5x icon-style rounded-circle"></i>
-          <h1>Online Courses</h1>
-          <p>
+          <h2>Online Courses</h2>
+          <h5 >
             Best Online Courses From The Best Teachers.
-          </p>
+          </h5>
         </div>
 
       </div>
@@ -115,10 +126,13 @@
       <div class="col-lg-4 col-md-4 col-sm-12">
         <div class="features">
           <i id="cap" class="fa fa-youtube-play fa-5x icon-style rounded-circle"></i>
-          <h1>Video Tutorials</h1>
-          <p>
-            Video Lectures of Each Topics that will Help You to Make Your Concept Clear
-          </p>
+          <h2>Video Tutorials</h2>
+          <div>
+            <h5 >
+              Video Lectures of Each Topics that will Help You to Make Your Concept Clear
+            </h5>
+          </div>
+          
         </div>
 
       </div>
@@ -126,10 +140,13 @@
       <div class="col-lg-4 col-md-4 col-sm-12">
         <div class="features">
           <i id="cap" class="fa fa-pencil-square-o fa-5x icon-style rounded-circle"></i>
-          <h1>MCQ Exams</h1>
-          <p>
-            After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
-          </p>
+          <h2>MCQ Exams</h2>
+          <div>
+            <h5 >
+              After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
+            </h5>
+          </div>
+          
         </div>
 
       </div>
@@ -142,65 +159,287 @@
 </div>
 <section id="features" class="text-center">
     <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-12">
+        {% if course1.0 %}
+        <div class="col" onclick="window.location='/course/{{course1.0.COURSE_ID}}';">
             <div class="features">
                 <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
-              <h1>DSA</h1>
-  
+              <h3>{{course1.0.TITLE}}</h3>
+              <p >{{course1.0.DESCRIPTIONS}}</p>
+              <p>Ratting: {{course1.0.RATTING}} &nbsp; &nbsp; Students: {{course1.0.NUM_OF_STUDENTS}}</p>
             </div>
-  
+        </div>
+        {% endif %}
+        {% if course1.1 %}
+        <div class="col" onclick="window.location='/course/{{course1.1.COURSE_ID}}';">
+          <div class="features">
+              <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+            <h3>{{course1.1.TITLE}}</h3>
+            <p >{{course1.1.DESCRIPTIONS}}</p>
+            <p>Ratting: {{course1.1.RATTING}} &nbsp; &nbsp; Students: {{course1.1.NUM_OF_STUDENTS}}</p>
           </div>
+        </div>
+        {% endif %}
+        {% if course1.2 %}
+        <div class="col" onclick="window.location='/course/{{course1.2.COURSE_ID}}';">
+          <div class="features">
+              <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+            <h3>{{course1.2.TITLE}}</h3>
+            <p >{{course1.2.DESCRIPTIONS}}</p>
+            <p>Ratting: {{course1.2.RATTING}} &nbsp; &nbsp; Students: {{course1.2.NUM_OF_STUDENTS}}</p>
+          </div>
+        </div>
+        {% endif %}
     </div>
 </section>
+<div class="heading">
+  <h3><a href="{% url 'all_courses' 'toprated' %}">Expand All</a></h3>
+</div>
 <div class="line"></div>
+<div class="heading">
+  <h2>Most Popular Courses</h2>
+</div>
+<section id="features" class="text-center">
+  <div class="row">
+      {% if course2.0 %}
+      <div class="col" onclick="window.location='/course/{{course2.0.COURSE_ID}}';">
+          <div class="features">
+              <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+            <h3>{{course2.0.TITLE}}</h3>
+            <p >{{course2.0.DESCRIPTIONS}}</p>
+            <p>Ratting: {{course2.0.RATTING}} &nbsp; &nbsp; Students: {{course2.0.NUM_OF_STUDENTS}}</p>
+          </div>
+      </div>
+      {% endif %}
+      {% if course2.1 %}
+      <div class="col" onclick="window.location='/course/{{course2.1.COURSE_ID}}';">
+        <div class="features">
+            <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+          <h3>{{course2.1.TITLE}}</h3>
+          <p >{{course2.1.DESCRIPTIONS}}</p>
+          <p>Ratting: {{course2.1.RATTING}} &nbsp; &nbsp; Students: {{course2.1.NUM_OF_STUDENTS}}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if course2.2 %}
+      <div class="col" onclick="window.location='/course/{{course2.2.COURSE_ID}}';">
+        <div class="features">
+            <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+          <h3>{{course2.2.TITLE}}</h3>
+          <p >{{course2.2.DESCRIPTIONS}}</p>
+          <p>Ratting: {{course2.2.RATTING}} &nbsp; &nbsp; Students: {{course2.2.NUM_OF_STUDENTS}}</p>
+        </div>
+      </div>
+      {% endif %}
+  </div>
+</section>
+<div class="heading">
+  <h3><a href="{% url 'all_courses' 'popular' %}">Expand All</a></h3>
+</div>
+<div class="line"></div>
+<div class="heading">
+  <h2>Most Popular Teachers</h2>
+</div>
+<section id="features" class="text-center">
+  <div class="row">
+      {% if teachers.0 %}
+      <div class="col" onclick="window.location='/profile/{{teachers.0.USER_ID}}';">
+          <div class="features">
+            <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+            <h3>{{teachers.0.NAME}}</h3>
+            <p>Courses: {{teachers.0.COURSE_TAKEN}}</p>
+          </div>
+      </div>
+      {% endif %}
+      {% if teachers.1 %}
+      <div class="col" onclick="window.location='/profile/{{teachers.1.USER_ID}}';">
+        <div class="features">
+            <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+            <h3>{{teachers.1.NAME}}</h3>
+            <p>Courses: {{teachers.1.COURSE_TAKEN}}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if teachers.2 %}
+      <div class="col" onclick="window.location='/profile/{{teachers.2.USER_ID}}';">
+        <div class="features">
+            <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+            <h3>{{teachers.2.NAME}}</h3>
+            <p>Courses: {{teachers.2.COURSE_TAKEN}}</p>
+        </div>
+      </div>
+      {% endif %}
+  </div>
+</section>
+<div class="heading">
+  <h3><a href="{% url 'all_teachers' %}">Expand All</a></h3>
+</div>
+<div class="mt-5"></div>
 {% endblock %}
 {% else %}
 {% block contain2 %}
 <section id="features1" class="text-center">
-    <div class="heading sm-12">
-      <h1>ESCHOOL</h1>
-      
-      <h4 class="text-center">Best Education From Home</h4>
-    </div>
-    <div class="row">
-      <div class="col-lg-4 col-md-4 col-sm-12">
-        <div class="features">
-          <i id="cap" class="fa fa-graduation-cap fa-5x icon-style rounded-circle"></i>
-          <h1>Online Courses</h1>
-          <p>
-            Best Online Courses From The Best Teachers.
-          </p>
-        </div>
-
-      </div>
-
-
-      <div class="col-lg-4 col-md-4 col-sm-12">
-        <div class="features">
-          <i id="cap" class="fa fa-youtube-play fa-5x icon-style rounded-circle"></i>
-          <h1>Video Tutorials</h1>
-          <p>
-            Video Lectures of Each Topics that will Help You to Make Your Concept Clear
-          </p>
-        </div>
-
-      </div>
-
-      <div class="col-lg-4 col-md-4 col-sm-12">
-        <div class="features">
-          <i id="cap" class="fa fa-pencil-square-o fa-5x icon-style rounded-circle"></i>
-          <h1>MCQ Exams</h1>
-          <p>
-            After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
-          </p>
-        </div>
-
+  <div class="heading sm-12">
+    <h1>ESCHOOL</h1>
+    
+    <h4 class="text-center">Best Education From Home</h4>
+  </div>
+  <div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="features">
+        <i id="cap" class="fa fa-graduation-cap fa-5x icon-style rounded-circle"></i>
+        <h1>Online Courses</h1>
+        <p>
+          Best Online Courses From The Best Teachers.
+        </p>
       </div>
 
     </div>
+
+
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="features">
+        <i id="cap" class="fa fa-youtube-play fa-5x icon-style rounded-circle"></i>
+        <h1>Video Tutorials</h1>
+        <p>
+          Video Lectures of Each Topics that will Help You to Make Your Concept Clear
+        </p>
+      </div>
+
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="features">
+        <i id="cap" class="fa fa-pencil-square-o fa-5x icon-style rounded-circle"></i>
+        <h1>MCQ Exams</h1>
+        <p>
+          After Finishing Each Topic,Students Can Take part in Exams to Test Their Learning
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+<div class="line"></div>
+<div class="heading">
+  <h2>Top Rated Courses</h2>
+</div>
+<section id="features" class="text-center">
+  <div class="row">
+      {% if course1.0 %}
+      <div class="col" onclick="window.location='/course/{{course1.0.COURSE_ID}}';">
+          <div class="features">
+              <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+            <h3>{{course1.0.TITLE}}</h3>
+            <p >{{course1.0.DESCRIPTIONS}}</p>
+            <p>Ratting: {{course1.0.RATTING}} &nbsp; &nbsp; Students: {{course1.0.NUM_OF_STUDENTS}}</p>
+          </div>
+      </div>
+      {% endif %}
+      {% if course1.1 %}
+      <div class="col" onclick="window.location='/course/{{course1.1.COURSE_ID}}';">
+        <div class="features">
+            <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+          <h3>{{course1.1.TITLE}}</h3>
+          <p >{{course1.1.DESCRIPTIONS}}</p>
+          <p>Ratting: {{course1.1.RATTING}} &nbsp; &nbsp; Students: {{course1.1.NUM_OF_STUDENTS}}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% if course1.2 %}
+      <div class="col" onclick="window.location='/course/{{course1.2.COURSE_ID}}';">
+        <div class="features">
+            <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+          <h3>{{course1.2.TITLE}}</h3>
+          <p >{{course1.2.DESCRIPTIONS}}</p>
+          <p>Ratting: {{course1.2.RATTING}} &nbsp; &nbsp; Students: {{course1.2.NUM_OF_STUDENTS}}</p>
+        </div>
+      </div>
+      {% endif %}
+  </div>
 </section>
 <div class="heading">
-    <h2>Top Rated Courses</h2>
+<h3><a href="{% url 'all_courses' 'toprated' %}">Expand All</a></h3>
 </div>
+<div class="line"></div>
+<div class="heading">
+<h2>Most Popular Courses</h2>
+</div>
+<section id="features" class="text-center">
+<div class="row">
+    {% if course2.0 %}
+    <div class="col" onclick="window.location='/course/{{course2.0.COURSE_ID}}';">
+        <div class="features">
+            <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+          <h3>{{course2.0.TITLE}}</h3>
+          <p >{{course2.0.DESCRIPTIONS}}</p>
+          <p>Ratting: {{course2.0.RATTING}} &nbsp; &nbsp; Students: {{course2.0.NUM_OF_STUDENTS}}</p>
+        </div>
+    </div>
+    {% endif %}
+    {% if course2.1 %}
+    <div class="col" onclick="window.location='/course/{{course2.1.COURSE_ID}}';">
+      <div class="features">
+          <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+        <h3>{{course2.1.TITLE}}</h3>
+        <p >{{course2.1.DESCRIPTIONS}}</p>
+        <p>Ratting: {{course2.1.RATTING}} &nbsp; &nbsp; Students: {{course2.1.NUM_OF_STUDENTS}}</p>
+      </div>
+    </div>
+    {% endif %}
+    {% if course2.2 %}
+    <div class="col" onclick="window.location='/course/{{course2.2.COURSE_ID}}';">
+      <div class="features">
+          <i class="fa-solid fa-chalkboard-user fa-5x icon-style rounded-circle"></i>
+        <h3>{{course2.2.TITLE}}</h3>
+        <p >{{course2.2.DESCRIPTIONS}}</p>
+        <p>Ratting: {{course2.2.RATTING}} &nbsp; &nbsp; Students: {{course2.2.NUM_OF_STUDENTS}}</p>
+      </div>
+    </div>
+    {% endif %}
+</div>
+</section>
+<div class="heading">
+<h3><a href="{% url 'all_courses' 'popular' %}">Expand All</a></h3>
+</div>
+<div class="line"></div>
+<div class="heading">
+<h2>Most Popular Teachers</h2>
+</div>
+<section id="features" class="text-center">
+<div class="row">
+    {% if teachers.0 %}
+    <div class="col" onclick="window.location='/profile/{{teachers.0.USER_ID}}';">
+        <div class="features">
+          <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+          <h3>{{teachers.0.NAME}}</h3>
+          <p>Courses: {{teachers.0.COURSE_TAKEN}}</p>
+        </div>
+    </div>
+    {% endif %}
+    {% if teachers.1 %}
+    <div class="col" onclick="window.location='/profile/{{teachers.1.USER_ID}}';">
+      <div class="features">
+          <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+          <h3>{{teachers.1.NAME}}</h3>
+          <p>Courses: {{teachers.1.COURSE_TAKEN}}</p>
+      </div>
+    </div>
+    {% endif %}
+    {% if teachers.2 %}
+    <div class="col" onclick="window.location='/profile/{{teachers.2.USER_ID}}';">
+      <div class="features">
+          <i class="fa fa-user fa-5x icon-style rounded-circle" ></i>
+          <h3>{{teachers.2.NAME}}</h3>
+          <p>Courses: {{teachers.2.COURSE_TAKEN}}</p>
+      </div>
+    </div>
+    {% endif %}
+</div>
+</section>
+<div class="heading">
+<h3><a href="{% url 'all_teachers' %}">Expand All</a></h3>
+</div>
+<div class="mt-5"></div>
 {% endblock %}
 {% endif %}

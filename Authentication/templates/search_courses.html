@@ -4,96 +4,102 @@
 {% block contain1 %}
 <div class="mt-5"></div>
 <div  style="width:900px; margin:0 auto;"> 
-    {% if request.session.role == 'admin' %}
-    <table class="table table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">Title</th>
-                <th scope="col">Students</th>
-                <th scope="col">Ratting</th>
-                <th scope="col">DELETE Course</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course in courses %}
-            <form class="mx-4" action="{% url 'delete_course' request.session.userid course.COURSE_ID %}" method="POST">
-                {% csrf_token %}
-            <div class="modal fade" id="removeModal{{course.COURSE_ID}}" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="removeModal{course.COURSE_ID}">Confirm Remove</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mx-4 text-dark">
-                            Are you sure want to Remove this Course?
-                        </p>
-                      
-                        <div class="mb-2">
-                          <label for="password">Password : </label>
-                          <input type="password" class="form-control" name="password" id="password">
+    {% if courses.0 %}
+        {% if request.session.role == 'admin' %}
+        <table class="table table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Students</th>
+                    <th scope="col">Ratting</th>
+                    <th scope="col">DELETE Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <form class="mx-4" action="{% url 'delete_course' request.session.userid course.COURSE_ID %}" method="POST">
+                    {% csrf_token %}
+                <div class="modal fade" id="removeModal{{course.COURSE_ID}}" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="removeModal{course.COURSE_ID}">Confirm Remove</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                      
+                        <div class="modal-body">
+                            <p class="mx-4 text-dark">
+                                Are you sure want to Remove this Course?
+                            </p>
+                        
+                            <div class="mb-2">
+                            <label for="password">Password : </label>
+                            <input type="password" class="form-control" name="password" id="password">
+                            </div>
+                        
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                      <button type="submit" class="btn btn-danger">Remove</button>
                     </div>
-                  </div>
                 </div>
-            </div>
-            </form>
-            <tr >
-                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.TITLE}}</td>
-                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.NUM_OF_STUDENTS}}</td>
-                <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.RATTING}}</td>
-                <td>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeModal{{course.COURSE_ID}}">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
+                </form>
+                <tr >
+                    <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.TITLE}}</td>
+                    <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.NUM_OF_STUDENTS}}</td>
+                    <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.RATTING}}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeModal{{course.COURSE_ID}}">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <ul class="list-group list-group-flush">
+            {% for course in courses %}
+            {% if course.APPROVED == 1 %}
+            <li class="list-group-item list-group-item-action shadow">
+                <div class="row  " onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;"  >
+                <div class="col-md-1">
+                    <img src="{% static 'images/course.png'%}" width="80px" style="border-radius: 50%;">
+                </div>
+                <div class="col-md-10 ml-4" style="padding-top: 0px;">
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h4 style="color:#069">Title: {{course.TITLE}}</h4>
+                        </div>
+        
+                    </div>
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h6 style="color:#069">Ratting : {{course.RATTING}}</h6>
+                        </div>
+            
+                    </div>              
+                    <div class="row  pt-2" >
+                        <div class="col-6">
+                            <h6 style="color:#069">Students : {{course.NUM_OF_STUDENTS}}</h6>
+                        </div>
+            
+                    </div>
                     
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <ul class="list-group list-group-flush">
-        {% for course in courses %}
-        {% if course.APPROVED == 1 %}
-        <li class="list-group-item list-group-item-action shadow">
-            <div class="row  " onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;"  >
-            <div class="col-md-1">
-                <img src="{% static 'images/course.png'%}" width="80px" style="border-radius: 50%;">
-            </div>
-            <div class="col-md-10 ml-4" style="padding-top: 0px;">
-                <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h4 style="color:#069">Title: {{course.TITLE}}</h4>
-                    </div>
-    
-                 </div>
-                <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h6 style="color:#069">Ratting : {{course.RATTING}}</h6>
-                    </div>
-        
-                </div>              
-                <div class="row  pt-2" >
-                    <div class="col-6">
-                        <h6 style="color:#069">Students : {{course.NUM_OF_STUDENTS}}</h6>
-                    </div>
-        
                 </div>
-                
-            </div>
-          
-            </div>
-          </li>
+            
+                </div>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul> 
         {% endif %}
-        {% endfor %}
-    </ul> 
+    {% else %}
+        <div class="m-5"></div>
+        <h2>No Courses Found With this search key</h2>
+        <div class="m-5"></div>
     {% endif %}
 </div> 
 {% endblock %}
@@ -101,6 +107,7 @@
 {% block contain2 %}
 <div class="mt-5"></div>
 <div  style="width:900px; margin:0 auto;"> 
+    {% if courses.0 %}
     <ul class="list-group list-group-flush">
         {% for course in courses %}
         {% if course.APPROVED == 1 %}
@@ -136,6 +143,11 @@
         {% endif %}
         {% endfor %}
     </ul> 
+    {% else %}
+    <div class="m-5"></div>
+    <h2>No Courses Found With This search key</h2>
+    <div class="m-5"></div>
+    {% endif %}
 </div> 
 {% endblock %}
 {% endif %}
