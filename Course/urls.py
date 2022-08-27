@@ -36,6 +36,7 @@ urlpatterns = [
     path('<int:course_id>/topic/<int:topic_id>/content/<int:content_id>/up_question/<int:q_id>', views.up_question, name='up_question'),
     path('<int:course_id>/topic/<int:topic_id>/content/<int:content_id>/down_question/<int:q_id>', views.down_question, name='down_question'),
     path('<int:course_id>/topic/<int:topic_id>/content/<int:content_id>/give_exam', views.give_exam, name='give_exam'),
+    path('<int:course_id>/topic/<int:topic_id>/content/<int:content_id>/lock_exam', views.lock_exam, name='lock_exam'),
 
 
     path('<int:course_id>/add_instructor', views.add_instructor, name='add_instructor'),

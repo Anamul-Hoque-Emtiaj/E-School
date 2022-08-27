@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block contain1 %}
 <div  style="width:900px; margin:0 auto;">
-    <H3>All Students</H3>
+    <H3 class="text-center m-5">All Students</H3>
     {% if request.session.role == 'admin' %}
     <table class="table table-hover">
         <thead class="thead-dark">
@@ -30,7 +30,7 @@
                       
                         <div class="mb-2">
                           <label for="password">Password : </label>
-                          <input type="password" class="form-control" name="password" id="password">
+                          <input type="password" class="form-control" name="password" id="password" minlength="5" required>
                         </div>
                       
                     </div>

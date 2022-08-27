@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.urls import reverse
-from Utils.dictfunc import multiget
+from Utils.HashPass import passlib_encryption, passlib_encryption_verify
 from Utils.fetcher import *
 
 # Create your views here.
@@ -24,8 +24,16 @@ def login(request):
         User = request.POST
         UID = -1
         with connections['eschool_db'].cursor() as c:
+            c.execute('SELECT COUNT(USER_ID) CN FROM "Users" WHERE EMAIL = %s ',[User['email']])
+            res=dictfetchone(c)
+            if res["CN"] == 0:
+                return render(request,'login.html',{'error':'Invalid Email given'})
+            c.execute('SELECT PASSWORD FROM "Users" WHERE EMAIL = %s ',[User['email']])
+            res=dictfetchone(c)
+            if not passlib_encryption_verify(User['password'],res["PASSWORD"]):
+                return render(request,'login.html',{'error':'password didnot matched'})
             temp = c.var(cx_Oracle.NUMBER).var
-            msg = c.callfunc("DO_LOGIN",cx_Oracle.STRING,[User['email'],User['password'],temp])
+            msg = c.callfunc("DO_LOGIN",cx_Oracle.STRING,[User['email'],temp])
             UID = int(temp.getvalue())
             print(msg,UID)
         if UID==-1:
@@ -45,8 +53,10 @@ def register_student(request):
         User = request.POST
         SID = -1
         with connections['eschool_db'].cursor() as c:
+            if User['password'] != User['cpassword']:
+                return render(request,'register_student.html',{'error':'password didnot matched'})
             temp = c.var(cx_Oracle.NUMBER).var
-            msg = c.callfunc("REGISTER_STUDENT",cx_Oracle.STRING,[User['name'],User['email'],User['password'],User['cpassword'],temp])
+            msg = c.callfunc("REGISTER_STUDENT",cx_Oracle.STRING,[User['name'],User['email'],passlib_encryption(User['password']),temp])
             SID = int(temp.getvalue())
             print(msg,SID)
         if SID==-1:
@@ -67,8 +77,10 @@ def register_teacher(request):
         User = request.POST
         TID = -1
         with connections['eschool_db'].cursor() as c:
+            if User['password'] != User['cpassword']:
+                return render(request,'register_teacher.html',{'error':'password didnot matched'})
             temp = c.var(cx_Oracle.NUMBER).var
-            msg = c.callfunc("REGISTER_TEACHER",cx_Oracle.STRING,[User['name'],User['email'],User['password'],User['cpassword'],User['designation'],temp])
+            msg = c.callfunc("REGISTER_TEACHER",cx_Oracle.STRING,[User['name'],User['email'],passlib_encryption(User['password']),User['designation'],temp])
             TID = int(temp.getvalue())
             print(msg,TID)
         if TID==-1:
@@ -121,7 +133,7 @@ def delete_user(request,user_id):
         pas = request.POST["password"]
         c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [request.session["userid"]])
         upas = dictfetchone(c)
-        if pas == upas["PASSWORD"]:
+        if passlib_encryption_verify(pas,upas["PASSWORD"]):
             c.execute('SELECT COUNT(S_ID) CN FROM "Students" WHERE S_ID = %s ',[user_id])
             stu=dictfetchone(c)
             c.callproc("DELETE_USER",[user_id])
@@ -148,3 +160,4 @@ def search_courses(request):
             courses=dictfetchall(c)
             print(courses)
     return render(request,'search_courses.html',{'courses':courses}) 
+

@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 {% block contain1 %}
 <div style="width:1100px; margin:0 auto;">
-    <h2 class="text-center my-5">Disscussion Forum</h2>
+    <div class="row my-5">
+        <div class="col-3">
+            <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}';">Back to Course</button>
+        </div>
+        <div class="col ml-5">
+            <h2 class="ml-5">Disscussion Forum</h2>
+        </div>
+    </div>
     <div class="panel">
         <div class="panel-body">
             <form class="form-settings" name = "comment" action="/course/{{cid}}/forum/add_comment" method="POST">
                 {% csrf_token %}
-                <textarea class="form-control" id="comment_text" name="comment_text" rows="3" placeholder="Post A Comment"></textarea>
+                <textarea class="form-control" id="comment_text" name="comment_text" rows="3" placeholder="Post A Comment" required></textarea>
                 <br>
                 <div class="mar-top clearfix">
                     <button class="btn btn-outline-primary pull-right" type="submit"> post </button>
@@ -49,7 +56,7 @@
                 <div class="modal-body">
                         <div class="mb-2">
                             <label for="description">Comment: </label>
-                            <textarea class="form-control" id="description" name="description" rows="3" >{{comment.DESCRIPTION}}</textarea>
+                            <textarea class="form-control" id="description" name="description" rows="3" required>{{comment.DESCRIPTION}}</textarea>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -93,7 +100,7 @@
                     <div class="panel-body">
                         <form class="form-settings" name = "comment" action="/course/{{comment.C_ID}}/forum/add_reply/{{comment.F_ID}}" method="POST">
                             {% csrf_token %}
-                            <textarea class="form-control" id="reply" name="reply" rows="3" placeholder="Post A reply"></textarea>
+                            <textarea class="form-control" id="reply" name="reply" rows="3" placeholder="Post A reply" required></textarea>
                             <br>
                             <div class="mar-top clearfix">
                                 <button class="btn btn-outline-primary pull-right" type="submit"> Reply </button>
@@ -107,49 +114,7 @@
         <div class="collapse" id="allreply-{{comment.F_ID}}">
             <div class="card card-body">
                 {% for comment1 in comments %}
-                <div class="modal fade" id="deleteReply-{{comment1.F_ID}}" tabindex="-1" aria-labelledby="deleteReply-{{comment1.F_ID}}Label" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteReply-{{comment1.F_ID}}">Confirm Delete</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p class="mx-4 text-dark">
-                                Are you sure want to Delete this Reply?
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-danger" onclick="window.location='/course/{{comment1.C_ID}}/forum/delete_comment/{{comment1.F_ID}}';">
-                                Delete</button>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <form class="mx-4" action="{{comment1.C_ID}}/forum/edit_comment/{{comment1.F_ID}}" method="POST">
-                    {% csrf_token %}
-                <div class="modal fade" id="editReply-{{comment1.F_ID}}" tabindex="-1" aria-labelledby="editReply-{{comment1.F_ID}}Label" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editReply-{{comment1.F_ID}}">Edit Reply</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                    <div class="mb-2">
-                                        <label for="description">Comment: </label>
-                                        <textarea class="form-control" id="description" name="description" rows="3" >{{comment1.DESCRIPTION}}</textarea>
-                                    </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </form>
+            
                 {% if comment1.PAR_COM_ID == comment.F_ID  %}
                 <div class="row justify-content-start border p-2">
                     <div class="col-1">
@@ -164,8 +129,8 @@
                         
                         <div class="row justify-content-end">
                             {% if request.session.userid == comment1.U_ID %}
-                            <div class="col-1"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#editReply-{{comment1.F_ID}}">Edit</a></h6></div>
-                            <div class="col-2"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#deleteReply-{{comment1.F_ID}}">Delete</a></h6></div>
+                            <div class="col-1"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#editComment-{{comment1.F_ID}}">Edit</a></h6></div>
+                            <div class="col-2"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#deleteComment-{{comment1.F_ID}}">Delete</a></h6></div>
                             {% endif %}
                         </div>
                         

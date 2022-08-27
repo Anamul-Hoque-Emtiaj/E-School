@@ -64,7 +64,7 @@ def course_details(request,course_id):
                     else:
                         role = 'student'
                 else:
-                    role = 'none' 
+                    role = 'admin' 
             else:
                 role = 'none'
             return render(request,'course_details.html',{'course':course,'role':role,'teachers':teachers,'topics':topics,'reviews':reviews,'feedback':feedback})
@@ -104,14 +104,15 @@ def delete_comment(request,course_id,forum_id):
     return redirect('/course/'+str(course_id)+'/forum')
 
 def topic(request,course_id,topic_id):
+    sid = -1
+    if request.session.has_key('userid'):
+        sid = request.session["userid"]
     with connections['eschool_db'].cursor() as c:
-        c.execute('''SELECT * FROM
-                    (SELECT * FROM "Contents" JOIN "Lecture" L on "Contents".CONTENT_ID = L.L_ID) FULL JOIN
-                    (SELECT * FROM "Contents" JOIN "Quizs" Q on "Contents".CONTENT_ID = Q.E_ID)
-                    USING (CONTENT_ID,NAME,TOPIC_ID,SERIAL,TYPE)
-                    WHERE TOPIC_ID = %s
-                    ORDER BY SERIAL
-                    ''', [topic_id])
+        c.execute('''SELECT * FROM (SELECT * FROM "Contents" JOIN (SELECT * FROM "Lecture" LEFT JOIN (SELECT * FROM "Completion" WHERE S_ID = %s) C2 USING(L_ID)) L on "Contents".CONTENT_ID = L.L_ID WHERE TOPIC_ID = %s) FULL JOIN
+                        (SELECT * FROM "Contents" JOIN (SELECT * FROM "Quizs" LEFT JOIN (SELECT S_ID,E_ID FROM "Take_Exams" WHERE S_ID = %s) USING(E_ID)) Q on "Contents".CONTENT_ID = Q.E_ID WHERE TOPIC_ID = %s) USING (CONTENT_ID,NAME,TOPIC_ID,SERIAL,TYPE,S_ID)
+                        WHERE TOPIC_ID = %s
+                        ORDER BY SERIAL
+                    ''', [sid,topic_id,sid,topic_id,topic_id])
         contents = dictfetchall(c)
         print(contents)
         if request.session.has_key('userid'):
@@ -210,13 +211,15 @@ def content(request,course_id,topic_id,content_id):
                     cur = dictfetchone(c)
                     obtainMark = -1
                     if cur["CN"]>0:
-                        c.execute('''SELECT OBTAINED_MARKS FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
+                        c.execute('''SELECT OBTAINED_MARKS,STATUS FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
                          ''', [request.session['userid'],content_id])
                         cur = dictfetchone(c)
                         obtainMark = cur["OBTAINED_MARKS"]
-
-                        if obtainMark*2>=content["MARKS"]:
-                            status = 'completed'
+                        stats = cur["STATUS"]
+                        if stats == 1:
+                            status = 'locked'
+                        elif obtainMark*2>=content["MARKS"]:
+                            status = 'passed'
                         else:
                             status = 'failed'
                     return render(request,'give_exam.html',{'content':content,'cid':course_id,'tid':topic_id,'role':role,'questions':questions,'obtainMark':obtainMark,'status':status})
@@ -367,7 +370,9 @@ def prev(request,course_id,topic_id,content_id):
                         ''', [topic_id,s2])
             cur = dictfetchone(c)
             cid = cur["CONTENT_ID"]
-    return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(cid))
+            return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(cid))
+        else:
+            return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def next(request,course_id,topic_id,content_id):
     cid = content_id
@@ -389,7 +394,9 @@ def next(request,course_id,topic_id,content_id):
                         ''', [topic_id,s2])
             cur = dictfetchone(c)
             cid = cur["CONTENT_ID"]
-    return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(cid))
+            return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(cid))
+        else:
+            return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def complete(request,course_id,topic_id,content_id):
     with connections['eschool_db'].cursor() as c:
@@ -490,6 +497,12 @@ def give_exam(request,course_id,topic_id,content_id):
             if mark>pmark:
                 c.execute('''UPDATE "Take_Exams" SET OBTAINED_MARKS = %s WHERE S_ID = %s AND E_ID = %s
                         ''', [mark,request.session["userid"],content_id])
+    return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
+
+def lock_exam(request,course_id,topic_id,content_id):
+    with connections['eschool_db'].cursor() as c:
+        c.execute('''UPDATE "Take_Exams" SET STATUS = 1 WHERE S_ID = %s AND E_ID = %s
+                        ''', [request.session["userid"],content_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def add_review(request,course_id):

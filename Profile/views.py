@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 from django.db import connections
 import cx_Oracle
+from Utils.HashPass import passlib_encryption_verify
 
 from Utils.fetcher import dictfetchall, dictfetchone
 from datetime import date
@@ -79,7 +80,7 @@ def change_password(request,user_id):
                 pas = request.POST["opassword"]
                 c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
                 upas = dictfetchone(c)
-                if pas == upas["PASSWORD"]:
+                if passlib_encryption_verify(pas,upas["PASSWORD"]):
                     c.execute('''UPDATE "Users" SET PASSWORD = %s WHERE USER_ID = %s ''', [npas,user_id])
     return redirect(setting,user_id)
 
@@ -89,7 +90,7 @@ def edit_info(request,user_id):
             pas = request.POST["password"]
             c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
             upas = dictfetchone(c)
-            if pas == upas["PASSWORD"]:
+            if passlib_encryption_verify(pas,upas["PASSWORD"]):
                 eml = request.POST["email"]
                 c.execute('''SELECT COUNT(EMAIL) CN FROM "Users" WHERE USER_ID <> %s AND EMAIL = %s''', [user_id,eml])
                 cnt = dictfetchone(c)
@@ -179,7 +180,7 @@ def delete_course(request,user_id,course_id ):
         pas = request.POST["password"]
         c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
         upas = dictfetchone(c)
-        if pas == upas["PASSWORD"]:
+        if passlib_encryption_verify(pas,upas["PASSWORD"]):
             if request.session["role"] == 'teacher':
                 c.execute('''SELECT T_ID FROM "Courses" WHERE COURSE_ID = %s ''', [course_id])
                 TID = dictfetchone(c)

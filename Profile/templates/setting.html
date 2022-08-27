@@ -10,21 +10,21 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" name="name" id="name"  placeholder="Enter Name" value="{{user.NAME}}">
+            <input type="text" class="form-control" name="name" id="name"  placeholder="Enter Name" value="{{user.NAME}}" required>
         </div>
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" class="form-control" name="email" id="email"  placeholder="Enter email" value="{{user.EMAIL}}">
+          <input type="email" class="form-control" name="email" id="email"  placeholder="Enter email" value="{{user.EMAIL}}" required>
         </div>
         {% if request.session.role == 'teacher' %}
         <div class="form-group">
             <label for="designation">Designation</label>
-            <input type="text" class="form-control" name="designation" id="designation"  placeholder="Designation" value="{{user.DESIGNATION}}">
+            <input type="text" class="form-control" name="designation" id="designation"  placeholder="Designation" value="{{user.DESIGNATION}}" required>
         </div>
         {% endif %}
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password" minlength="5" required>
         </div>
         
         <button type="submit" class="btn btn-primary">Save</button>
@@ -35,17 +35,17 @@
         {% csrf_token %}
         <div class="form-group">
           <label for="npassword">New Password</label>
-          <input type="password" class="form-control" name="npassword" id="npassword" placeholder="New Password" >
+          <input type="password" class="form-control" name="npassword" id="npassword" placeholder="New Password" minlength="5" required>
         </div>
 
         <div class="form-group">
             <label for="cpassword">Confirm Password</label>
-            <input type="password" class="form-control" name="cpassword" id="cpassword" placeholder="Confirm Password" >
+            <input type="password" class="form-control" name="cpassword" id="cpassword" placeholder="Confirm Password" minlength="5" required>
         </div>
 
         <div class="form-group">
             <label for="opassword">Old Password</label>
-            <input type="password" class="form-control" name="opassword" id="opassword" placeholder="Old Password" >
+            <input type="password" class="form-control" name="opassword" id="opassword" placeholder="Old Password" minlength="5" required>
         </div>
         
         <button type="submit" class="btn btn-primary">Save</button>

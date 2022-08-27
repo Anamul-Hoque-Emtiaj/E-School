@@ -4,8 +4,10 @@
 {% block contain1 %}
 <div class="mt-5"></div>
 <div style="width:1300px; margin:0 auto;">
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/topic/{{tid}}';">Back to Topic</button>
         <h3>{{content.NAME}}</h3>
+        <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/forum';"> Ask Questions</button>
     </div>
     <div class="mt-5"></div>
     
@@ -31,27 +33,27 @@
                   <div class="modal-body">
                       <div class="mb-2">
                         <label for="question">Questions: </label>
-                        <input type="text" class="form-control" name="question">
+                        <input type="text" class="form-control" name="question" required>
                       </div>
                       <div class="mb-2">
                         <label for="op1">Option 1: </label>
-                        <input type="text" class="form-control" name="op1">
+                        <input type="text" class="form-control" name="op1" required>
                       </div>
                       <div class="mb-2">
                         <label for="op2">Option 2: </label>
-                        <input type="text" class="form-control" name="op2">
+                        <input type="text" class="form-control" name="op2" required>
                       </div>
                       <div class="mb-2">
                         <label for="op3">Option 3: </label>
-                        <input type="text" class="form-control" name="op3">
+                        <input type="text" class="form-control" name="op3"required>
                       </div>
                       <div class="mb-2">
                         <label for="op4">Option 4: </label>
-                        <input type="text" class="form-control" name="op4">
+                        <input type="text" class="form-control" name="op4" required>
                       </div>
                       <div class="mb-2">
                         <label for="ra">Correct Option: </label>
-                        <select class="custom-select" name="ra">
+                        <select class="custom-select" name="ra" required>
                             <option selected>Choose Correct Option</option>
                             <option value="1">Option 1</option>
                             <option value="2">Option 2</option>
@@ -61,7 +63,7 @@
                       </div>
                       <div class="mb-2">
                         <label for="mark">Mark: </label>
-                        <input type="number" class="form-control" name="mark" value="1">
+                        <input type="number" class="form-control" name="mark" value="1" required>
                       </div>
                   </div>
                   <div class="modal-footer">
@@ -87,15 +89,15 @@
                   <div class="modal-body">
                         <div class="mb-2">
                             <label for="question">Questions: </label>
-                            <input type="text" class="form-control" name="question">
+                            <input type="text" class="form-control" name="question" required>
                         </div>
                         <div class="mb-2">
                             <label for="ra">Answer: </label>
-                            <input type="text" class="form-control" name="ra">
+                            <input type="text" class="form-control" name="ra" required>
                         </div>
                         <div class="mb-2">
                             <label for="mark">Mark: </label>
-                            <input type="number" class="form-control" name="mark" value="1">
+                            <input type="number" class="form-control" name="mark" value="1" required>
                         </div>
                   </div>
                   <div class="modal-footer">
@@ -126,49 +128,66 @@
                     {% if question.TYPE == 'mcq' %}
                     <div class="mb-2">
                       <label for="question">Questions: </label>
-                      <input type="text" class="form-control" name="question" id="question" value="{{question.QUESTION}}">
+                      <input type="text" class="form-control" name="question" id="question" value="{{question.QUESTION}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="op1">Option 1: </label>
-                      <input type="text" class="form-control" name="op1" value="{{question.OP1}}">
+                      <input type="text" class="form-control" name="op1" value="{{question.OP1}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="op2">Option 2: </label>
-                      <input type="text" class="form-control" name="op2" value="{{question.OP2}}">
+                      <input type="text" class="form-control" name="op2" value="{{question.OP2}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="op3">Option 3: </label>
-                      <input type="text" class="form-control" name="op3" value="{{question.OP3}}">
+                      <input type="text" class="form-control" name="op3" value="{{question.OP3}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="op4">Option 4: </label>
-                      <input type="text" class="form-control" name="op4" value="{{question.OP4}}">
+                      <input type="text" class="form-control" name="op4" value="{{question.OP4}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="ra">Correct Option: </label>
-                      <select class="custom-select" name="ra">
+                      <select class="custom-select" name="ra" required>
+                          {% if question.RA == '1' %}
                           <option value="1" selected>Option 1</option>
+                          {% else %}
+                          <option value="1">Option 1</option>
+                          {% endif %}
+                          
+                          {% if question.RA == '2' %}
+                          <option value="2" selected>Option 2</option>
+                          {% else %}
                           <option value="2">Option 2</option>
+                          {% endif %}
+                          {% if question.RA == '3' %}
+                          <option value="3" selected>Option 3</option>
+                          {% else %}
                           <option value="3">Option 3</option>
+                          {% endif %}
+                          {% if question.RA == '4' %}
+                          <option value="4" selected>Option 4</option>
+                          {% else %}
                           <option value="4">Option 4</option>
+                          {% endif %}
                       </select>
                     </div>
                     <div class="mb-2">
                       <label for="mark">Mark: </label>
-                      <input type="number" class="form-control" name="mark" value="{{question.NUM}}">
+                      <input type="number" step="any" class="form-control" name="mark" value="{{question.NUM}}" required>
                     </div>
                     {% else %}
                     <div class="mb-2">
                       <label for="question">Questions: </label>
-                      <input type="text" class="form-control" name="question" value="{{question.Questions}}">
+                      <input type="text" class="form-control" name="question" value="{{question.QUESTION}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="ra">Answer: </label>
-                      <input type="text" class="form-control" name="ra" value="{{question.RA}}">
+                      <input type="text" class="form-control" name="ra" value="{{question.RA}}" required>
                     </div>
                     <div class="mb-2">
                       <label for="mark">Mark: </label>
-                      <input type="number" class="form-control" name="mark" value="{{question.NUM}}">
+                      <input type="number" step="any" class="form-control" name="mark" value="{{question.NUM}}" required>
                     </div>
                     {% endif %}
                   
@@ -268,6 +287,10 @@
   </div>
   {% endfor %}
     </ol>
+    <div class="d-flex justify-content-center ">
+      <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/prev';">Prev</button>
+      <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/next';">Next</button>
+    </div>
 </div>
 
 {% endblock %}

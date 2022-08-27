@@ -3,12 +3,17 @@
 {% if 'userid' in request.session %}
 {% block contain1 %}
 <div style="width:1300px; margin:0 auto;">
-    <div class="mt-5"></div>
-    <p ><H3 class="text-center text-dark font-weight-bold">Course Content</H3> </p>
-    <div class="mt-5"></div>
+    <div class="row my-5">
+        <div class="col-3">
+            <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}';">Back to Course</button>
+        </div>
+        <div class="col ml-5">
+            <h2 class="ml-5">Course Content</h2>
+        </div>
+    </div>
 
     {% if role == 'teacher' or role == 'contributer' %}
-    <div class="row">
+    <div class="row justify-content-end">
         <div class="col-2">
             <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addLectureModal">
                 Add Lecture
@@ -25,7 +30,7 @@
                       <div class="modal-body">
                           <div class="mb-2">
                             <label for="title">Title: </label>
-                            <input type="text" class="form-control" name="title" id="title">
+                            <input type="text" class="form-control" name="title" id="title" required>
                           </div>
                           <div class="mb-2">
                             <label for="link">Video Link: </label>
@@ -66,7 +71,7 @@
                         <div class="modal-body">
                                 <div class="mb-2">
                                     <label for="name">Exam Name: </label>
-                                    <input type="text" class="form-control" name="title" id="name" value="{{content.NAME}}">
+                                    <input type="text" class="form-control" name="title" id="name" value="{{content.NAME}}" required>
                                 </div>
                         </div>
                         <div class="modal-footer">
@@ -99,7 +104,7 @@
                     <div class="modal-body">
                             <div class="mb-2">
                                 <label for="name">Content Name: </label>
-                                <input type="text" class="form-control" name="title" value="{{content.NAME}}">
+                                <input type="text" class="form-control" name="title" value="{{content.NAME}}" required>
                             </div>
                             {% if content.TYPE == 'lecture' %}
                             <div class="mb-2">
@@ -151,15 +156,15 @@
 
         <li class="list-group-item list-group-item-action shadow">
             <div class="row">
-                <div class="col" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+                <div class="col-lg-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
                     {% if content.TYPE == 'lecture' %}
-                    <img src="{% static 'images/lecture.png'%}" width="80px" style="border-radius: 50%;">
+                    <img src="{% static 'images/lecture.png'%}" width="80px" >
                     {% else %}
-                    <img src="{% static 'images/exam.png'%}" width="80px" style="border-radius: 50%;">
+                    <img src="{% static 'images/ques1.png'%}" width="80px" >
                     {% endif %}
                 </div>
                 {% if role == 'teacher' or role == 'contributer' %}
-                <div class="col" >
+                <div class="col-lg-1" >
                     <div class="row " >
                         <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/up_content';">
                             <i class="fa-solid fa-arrow-up"></i>
@@ -172,7 +177,7 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="col-8" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+                <div class="col" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
                     <div class="row  pt-2" >
                         <div class="col-6" >
                             <h4 style="color:#069">{{content.NAME}}</h4>
@@ -200,16 +205,25 @@
                     </div>        
                 </div>
                 {% if role == 'teacher' or role == 'contributer' %}
-                <div class="col mt-3 " >
+                <div class="col-lg-1 mt-3 " >
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal-{{content.CONTENT_ID}}">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                     </button>
                     
                 </div>
-                <div class="col mt-3 ">
+                <div class="col-lg-1 mt-3 ">
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteContentModal-{{ content.CONTENT_ID }}">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
+                </div>
+                {% endif %}
+                {% if role == 'estudent' %}
+                <div class="col-lg-1 mt-3" >
+                    {% if content.S_ID == request.session.userid %}
+                    <i class="fas fa-check-circle fa-2x "></i>
+                    {% else %}
+                    <i class="fa-solid fa-circle-xmark fa-2x"></i>
+                    {% endif %}
                 </div>
                 {% endif %}
           
@@ -222,22 +236,28 @@
 {% else %}
 {% block contain2 %}
 <div style="width:1300px; margin:0 auto;">
-    <div class="mt-5"></div>
-    <p ><H3 class="text-center text-dark font-weight-bold">Course Content</H3> </p>
-    <div class="mt-5"></div>
+    
+    <div class="row my-5">
+        <div class="col-3">
+            <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}';">Back to Course</button>
+        </div>
+        <div class="col ml-5">
+            <h2 class="ml-5">Course Content</h2>
+        </div>
+    </div>
 
     <ul class="list-group list-group-flush">
         {% for content in contents %}
         <li class="list-group-item list-group-item-action shadow">
             <div class="row  ">
-            <div class="col-md-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+            <div class="col-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
                 {% if content.TYPE == 'lecture' %}
-                <img src="{% static 'images/lecture.png'%}" width="80px" style="border-radius: 50%;">
+                <img src="{% static 'images/lecture.png'%}" width="80px" >
                 {% else %}
-                <img src="{% static 'images/exam.png'%}" width="80px" style="border-radius: 50%;">
+                <img src="{% static 'images/ques1.png'%}" width="80px" >
                 {% endif %}
             </div>
-            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+            <div class="col ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
                 <div class="row  pt-2" >
                     <div class="col-6" >
                         <h4 style="color:#069">{{content.NAME}}</h4>

@@ -3,17 +3,22 @@
 
 {% block contain1 %}
 <div class="mt-5"></div>
-
+<div style="width:1200px; margin:0 auto;">
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/topic/{{tid}}';">Back to Topic</button>
+          <h3>{{content.NAME}}</h3>
+        <button type="button" class="btn btn-dark mx-2" onclick="window.location='/course/{{cid}}/forum';"> Ask Questions</button>
+    </div>
+</div>
 <div style="width:700px; margin:0 auto;">
+    <div class="mt-5"></div>
     {% if content.VIDEO_LINK != NULL %}
     <div class="ml-5">
         <iframe width="560" height="315" src={{content.VIDEO_LINK}} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
     {% endif %}
-    <div class="mt-2"></div>
-    <p ><H3 class="text-center text-dark font-weight-bold">{{content.NAME}}</H3> </p>
-    <div class="mt-5"></div>
-    <div class="d-flex justify-content-around">
+    
+    <div class="d-flex justify-content-around mt-2">
         <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/prev';">Prev</button>
         {% if role == 'estudent' %}
         {% if status == 'pending' %}
