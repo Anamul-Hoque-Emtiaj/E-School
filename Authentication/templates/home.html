@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% if 'userid' in request.session %}
 {% block header %}
 <style>
     body {
@@ -114,6 +113,7 @@
    
   </style>
 {% endblock %}
+{% if 'userid' in request.session %}
 {% block contain1 %}
 <section id="features1" class="text-center">
     <div class="heading sm-12">

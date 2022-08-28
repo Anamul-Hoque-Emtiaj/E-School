@@ -4,17 +4,41 @@
 {% block contain1 %}
     {% if owner == 1 %}
         <div class="mt-5"></div>
-        <div  style="width:300px; margin:0 auto;">
-            <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-            <h2 class="ml-3">{{ user.role }}</h2>
-            <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
-        </div>
-        <div class="mt-5"></div>
-        <div  style="width:900px; margin:0 auto;">  
-            <p ><h5 >Email: {{ user.EMAIL }}  </h5></p>
-            <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
-            <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
-
+        <div  style="width:1100px; margin:0 auto;">
+            <div class="mt-5"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+                </div>
+                
+            </div>
+            <div class="mt-3"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <h2 class="ml-3">{{ user.role }}</h2>
+                </div>  
+            </div>
+            <div class="mt-5"></div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"> <b>Name:</b> {{ user.NAME }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Email: </b>{{ user.EMAIL }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Number of Courses: </b>{{ user.NOC }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Registered: </b>{{ user.RDATE }} </p>
+                </div>  
+            </div>    
             <div class="line"></div>
             <div>
                 <p ><h5 >Course Taken:</h5></p>
@@ -58,17 +82,17 @@
                         </div>
                         </form>
                         <tr >
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.TITLE}}</td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.TITLE}}</td>
                             {% if course.ISAPPROVED == 0 %}
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">Pending</td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Pending</td>
                             {% elif course.ISAPPROVED == -1 %}
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">Rejected</td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Rejected</td>
                             {% elif course.PROGRESS == 1 %}
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">Completed</td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
                             {% else %}
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">Running</td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
                             {% endif %}
-                            <td onclick="window.location='/course/{{course.COURSE_ID}}';">{{course.Date}} </td>
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.Date}} </td>
                             <td>
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeModal{{course.COURSE_ID}}">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -80,36 +104,134 @@
                     </tbody>
                 </table>
             </div>
-           
-        </div>
-        
+        </div>  
     {% else %}
     <div class="mt-5"></div>
-    <div  style="width:300px; margin:0 auto;">
-        
-        <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-        <h2 class="ml-3">{{ user.role }}</h2>
-        <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
-    </div>
-    <div class="mt-5"></div>
-    <div  style="width:900px; margin:0 auto;">  
-        <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
-        <p ><h5 >Registered: {{ user.RDATE }}  </h5></p>
-    </div>
+        <div  style="width:1100px; margin:0 auto;">
+            <div class="mt-5"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+                </div>
+                
+            </div>
+            <div class="mt-3"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <h2 class="ml-3">{{ user.role }}</h2>
+                </div>  
+            </div>
+            <div class="mt-5"></div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"> <b>Name:</b> {{ user.NAME }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Number of Courses: </b>{{ user.NOC }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Registered: </b>{{ user.RDATE }} </p>
+                </div>  
+            </div>     
+            <div class="line"></div>
+            <div>
+                <p ><h5 >Course Taken:</h5></p>
+                <table class="table table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Enroll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        {% if course.ISAPPROVED == 1 %}
+                        <tr >
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.TITLE}}</td>
+                            {% if course.PROGRESS == 1 %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
+                            {% else %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
+                            {% endif %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.Date}} </td>
+                            
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}
 {% else %}
 {% block contain2 %}
 <div class="mt-5"></div>
-<div  style="width:300px; margin:0 auto;">
-    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-    <h2 class="ml-3">{{ user.role }}</h2>
-    <p><h3 class="ml-3" style="color:black">{{ user.NAME }} </h3> </p>    
-</div>
-<div class="mt-5"></div>
-<div  style="width:900px; margin:0 auto;">  
-    <p ><h5 >Number of Courses: {{ user.NOC }}  </h5></p>
-    <p ><h5 >Registered: {{ user.RDATE }} </h5></p>
-</div>
+        <div  style="width:1100px; margin:0 auto;">
+            <div class="mt-5"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+                </div>
+                
+            </div>
+            <div class="mt-3"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <h2 class="ml-3">{{ user.role }}</h2>
+                </div>  
+            </div>
+            <div class="mt-5"></div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"> <b>Name:</b> {{ user.NAME }}  </p>
+                </div>  
+            </div>
+            
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Number of Courses: </b>{{ user.NOC }}  </p>
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Registered: </b>{{ user.RDATE }} </p>
+                </div>  
+            </div>     
+            <div class="line"></div>
+            <div>
+                <p ><h5 >Course Taken:</h5></p>
+                <table class="table table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Enroll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        {% if course.ISAPPROVED == 1 %}
+                        <tr >
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.TITLE}}</td>
+                            {% if course.PROGRESS == 1 %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
+                            {% else %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
+                            {% endif %}
+                            <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.Date}} </td>
+                            
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 {% endblock %}
 {% endif %}

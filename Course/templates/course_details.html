@@ -1,29 +1,96 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block header %}
+<style>
+    body {
+      
+     
+    }
 
+    .heading h1 {
+      text-align: center;
+      font-size: 80px;
+      color: rgb(240, 181, 247);
+      margin-top: 150px;
+     
+     
+
+    }
+    .heading h4 {
+      text-align: center;
+      font-size: 40px;
+      color: rgb(246, 235, 235);
+      margin-top: 20px;
+    }
+
+    .heading h3 {
+      text-align: end;
+      font-size: 35px;
+      color: rgb(255, 255, 234);
+      margin-bottom: 180px;
+      margin-top: 15px;
+
+    }
+
+    .row {
+      margin: 5px;
+      
+    }
+
+    #features1{
+      padding: 2%;
+     
+      border: 10px;
+      background-image: url('{% static "/images/cbg.jpg" %}');
+      background-size: 1200px 600px;
+    }
+
+    
+
+    .features2 {
+      border: 1px solid red;
+      padding: 5px;
+      border-radius: 5px;
+      margin: 8px;
+      transition: 0.5s;
+      background: rgb(222, 134, 231);
+    }
+
+    .features2:hover {
+      transform: scale(1.1);
+      box-shadow: 2px 6px 5px;
+    }
+
+    .features2 p {
+      font-size: 20px;
+      color: black;
+    }
+
+    .icon-style {
+      background: rgb(82, 174, 240);
+      padding: 15px;
+      margin: 5px;
+
+    }
+   
+  </style>
+{% endblock %}
 {% if 'userid' in request.session %}
 {% block contain1 %}
-
-<div class="mt-5"></div>
-<div  style="width:400px; margin:0 auto;"> 
-    <img class="ml-5" src="{% static 'images/course_bg.png'%}" width="150px" >
-    {% if role == 'student' %}
-    <div class="ml-5 mt-3">
-        <button type="button" class="btn btn-primary ml-3" onclick="window.location='/course/{{course.COURSE_ID}}/enroll/{{request.session.userid}}';">
-            Enroll now
-        </button>
+<div style="width:1200px; margin:0 auto;">
+    <section id="features1" class="text-center">
+        <div class="heading sm-12">
+          <h1>{{ course.TITLE }}</h1>
+          
+          <h4 class="text-center">{{ course.NUM_OF_STUDENTS }} Students </h4>
+          <h3 class="text-center">{{ course.RATTING }} Rattings</h3>
+        </div>
+    </section>
+    <div class="my-5">
+        <h3>Descriptions</h3>
+        <p class="text-dark">{{ course.DESCRIPTIONS }} </p>
     </div>
-    {% endif %}
-    <p ><h3  style="color:black">{{ course.TITLE }} </h3> </p>    
-    <p class="text-dark">{{ course.DESCRIPTIONS }} </p> 
-</div>
-<div class="mt-5"></div>
-<div  style="width:900px; margin:0 auto;">  
-    <p ><h5 >Students: {{ course.NUM_OF_STUDENTS }}  </h5></p>
-    <p ><h5 >Ratting: {{ course.RATTING }}  </h5></p>
-</div>
-<div class="line"></div>
-<div style="width:1300px; margin:0 auto;">
+    <div class="line"></div>
     <p ><H3 class="text-center text-dark font-weight-bold">Course Instructors</H3> </p>
     <div class="mt-5"></div>
     {% if role == 'teacher' %}
@@ -71,7 +138,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_instructor/{{teacher.USER_ID}}';">Delete</button>
+                        <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_instructor/{{teacher.USER_ID}}';" style="cursor:pointer;">Delete</button>
                     </div>
                 </div>
             </div>
@@ -111,9 +178,7 @@
           </li>
         {% endfor %}
     </ul> 
-</div>
-<div class="line"></div>
-<div style="width:1300px; margin:0 auto;">
+    <div class="line"></div>
     <p ><H3 class="text-center text-dark font-weight-bold">Course Topics</H3> </p>
     <div class="mt-5"></div>
     {% if role == 'teacher' or role == 'contributer' %}
@@ -194,7 +259,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_topic/{{topic.TOPIC_ID}}';">Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location='{{course.COURSE_ID}}/remove_topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">Delete</button>
                 </div>
                 </div>
             </div>
@@ -202,24 +267,24 @@
         <!--Modal ended-->
         <li class="list-group-item list-group-item-action shadow">
             <div class="row  ">
-                <div class="col-lg-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <div class="col-lg-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                     <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
                 </div>
                 {% if role == 'teacher' or role == 'contributer' %}
                 <div class="col-1" >
                     <div class="row " >
-                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/up_topic/{{topic.TOPIC_ID}}';">
+                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/up_topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                             <i class="fa-solid fa-arrow-up"></i>
                         </button>
                     </div>
                     <div class="row " >
-                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/down_topic/{{topic.TOPIC_ID}}';">
+                        <button type="button" class="btn btn-light" onclick="window.location='{{course.COURSE_ID}}/down_topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                             <i class="fa-solid fa-arrow-down"></i>
                         </button>
                     </div>
                 </div>
                 {% endif %}
-                <div class="col" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+                <div class="col" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                     <div class="row  pt-2" >
                         <div class="col-6" >
                             <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
@@ -271,113 +336,114 @@
             {% endif %}
         </div>
     </div>
-</div>
-<div style="width:1000px; margin:0 auto;">
-    <div class="collapse" id="collapseExample">
-        <h2 class="text-center my-2">Reviews</h2>
-        <div class="card card-body">
-            {% for review in reviews %}
-            <div class="modal fade" id="deleteReview-{{review.S_ID}}" tabindex="-1" aria-labelledby="deleteReview-{{review.S_ID}}Label" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteReview-{{review.S_ID}}">Confirm Delete</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mx-4 text-dark">
-                            Are you sure want to Delete this Review?
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" onclick="window.location='/course/{{course.COURSE_ID}}/delete_review';">
-                            Delete
-                        </button>
-                    </div>
-                    </div>
-                </div>
-            </div>
-            <form class="mx-4" action="{{course.COURSE_ID}}/edit_review" method="POST">
-                {% csrf_token %}
-            <div class="modal fade" id="editReview-{{review.S_ID}}" tabindex="-1" aria-labelledby="editReview-{{review.S_ID}}Label" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editReview-{{review.S_ID}}">Edit Review</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div style="width:1000px; margin:0 auto;">
+        <div class="collapse" id="collapseExample">
+            <h2 class="text-center my-2">Reviews</h2>
+            <div class="card card-body">
+                {% for review in reviews %}
+                <div class="modal fade" id="deleteReview-{{review.S_ID}}" tabindex="-1" aria-labelledby="deleteReview-{{review.S_ID}}Label" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteReview-{{review.S_ID}}">Confirm Delete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                <div class="mb-2">
-                                    <label for="ratting">Ratting: </label>
-                                    <input type="number" step="any" class="form-control" name="ratting" value="{{review.RATTING}}" required>
-                                </div>
-                                <div class="mb-2">
-                                    <label for="review">Review: </label>
-                                    <input type="text" class="form-control" name="review" value="{{review.REVIEW}}">
-                                </div>
+                            <p class="mx-4 text-dark">
+                                Are you sure want to Delete this Review?
+                            </p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-danger" onclick="window.location='/course/{{course.COURSE_ID}}/delete_review';">
+                                Delete
+                            </button>
+                        </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            </form>
-            <div class="row justify-content-start">
-                <div class="col-3">
-                    <div class="row ml-5 mb-2 align-items-center" onclick="window.location='/profile/{{review.USER_ID}}';"><i class="fa fa-user fa-2x rounded-circle"></i></div>
-                    <div class="row ml-1 align-items-end">{{review.FDATE}}</div>
-                </div>
-                <div class="col">
-                    <div class="row justify-content-between">
-                        <div class="col-9"><h5> <a href="{% url 'profile' review.USER_ID %}">{{review.NAME}}</a></h5></div>
-                        <div class="col"><h6>Ratting: {{review.RATTING}}</h6></div>
+                <form class="mx-4" action="{{course.COURSE_ID}}/edit_review" method="POST">
+                    {% csrf_token %}
+                <div class="modal fade" id="editReview-{{review.S_ID}}" tabindex="-1" aria-labelledby="editReview-{{review.S_ID}}Label" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editReview-{{review.S_ID}}">Edit Review</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                    <div class="mb-2">
+                                        <label for="ratting">Ratting: </label>
+                                        <input type="number" step="any" class="form-control" name="ratting" value="{{review.RATTING}}" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="review">Review: </label>
+                                        <input type="text" class="form-control" name="review" value="{{review.REVIEW}}">
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="row ml-1">{{review.REVIEW}}</div>
-                    {% if feedback == 'done' %}
-                    <div class="row justify-content-end">
-                        <div class="col-1"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#editReview-{{review.S_ID}}">Edit</a></h6></div>
-                        <div class="col-2"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#deleteReview-{{review.S_ID}}">Delete</a></h6></div>
+                </div>
+                </form>
+                <div class="row justify-content-start">
+                    <div class="col-3">
+                        <div class="row ml-5 mb-2 align-items-center" onclick="window.location='/profile/{{review.USER_ID}}';" style="cursor:pointer;"><i class="fa fa-user fa-2x rounded-circle"></i></div>
+                        <div class="row ml-1 align-items-end">{{review.FDATE}}</div>
                     </div>
-                    {% endif %}
+                    <div class="col">
+                        <div class="row justify-content-between">
+                            <div class="col-9"><h5> <a href="{% url 'profile' review.USER_ID %}">{{review.NAME}}</a></h5></div>
+                            <div class="col"><h6>Ratting: {{review.RATTING}}</h6></div>
+                        </div>
+                        <div class="row ml-1">{{review.REVIEW}}</div>
+                        {% if feedback == 'done' %}
+                        <div class="row justify-content-end">
+                            <div class="col-1"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#editReview-{{review.S_ID}}">Edit</a></h6></div>
+                            <div class="col-2"><h6> <a type="button" data-bs-toggle="modal" data-bs-target="#deleteReview-{{review.S_ID}}">Delete</a></h6></div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
+                {% endfor %}
+                {% if feedback == 'yes' %}
+                <form action="{{course.COURSE_ID}}/add_review" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ratting">Ratting</label>
+                        <input type="number" step="any" class="form-control" name="ratting" id="ratting"  placeholder="Ratting" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="review">Review</label>
+                        <input type="text" class="form-control" name="review" id="review"  placeholder="Review">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                {% endif %}
             </div>
-            {% endfor %}
-            {% if feedback == 'yes' %}
-            <form action="{{course.COURSE_ID}}/add_review" method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="ratting">Ratting</label>
-                    <input type="number" step="any" class="form-control" name="ratting" id="ratting"  placeholder="Ratting" required>
-                </div>
-                <div class="form-group">
-                    <label for="review">Review</label>
-                    <input type="text" class="form-control" name="review" id="review"  placeholder="Review">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-            {% endif %}
         </div>
     </div>
 </div>
 {% endblock %}
 {% else %}
 {% block contain2 %}
-<div class="mt-5"></div>
-<div  style="width:400px; margin:0 auto;"> 
-    <img class="ml-5" src="{% static 'images/course_bg.png'%}" width="150px" >
-    <p ><h3  style="color:black">{{ course.TITLE }} </h3> </p>    
-    <p class="text-dark">{{ course.DESCRIPTIONS }} </p> 
-</div>
-<div class="mt-5"></div>
-<div  style="width:900px; margin:0 auto;">  
-    <p ><h5 >Students: {{ course.NUM_OF_STUDENTS }}  </h5></p>
-    <p ><h5 >Ratting: {{ course.RATTING }}  </h5></p>
-</div>
-<div class="line"></div>
-<div style="width:1300px; margin:0 auto;">
+<div style="width:1200px; margin:0 auto;">
+    <section id="features1" class="text-center">
+        <div class="heading sm-12">
+          <h1>{{ course.TITLE }}</h1>
+          
+          <h4 class="text-center">{{ course.NUM_OF_STUDENTS }} Students </h4>
+          <h3 class="text-center">{{ course.RATTING }} Rattings</h3>
+        </div>
+    </section>
+    <div class="my-5">
+        <h3>Descriptions</h3>
+        <p class="text-dark">{{ course.DESCRIPTIONS }} </p>
+    </div>
+    <div class="line"></div>
     <p ><H3 class="text-center text-dark font-weight-bold">Course Instructors</H3> </p>
     <div class="mt-5"></div>
     <ul class="list-group list-group-flush">
@@ -412,20 +478,18 @@
             </div>
           </li>
         {% endfor %}
-    </ul> 
-</div>
-<div class="line"></div>
-<div style="width:1300px; margin:0 auto;">
+    </ul>
+    <div class="line"></div>
     <p ><H3 class="text-center text-dark font-weight-bold">Course Topics</H3> </p>
     <div class="mt-5"></div>
     <ul class="list-group list-group-flush">
         {% for topic in topics %}
         <li class="list-group-item list-group-item-action shadow">
             <div class="row  ">
-            <div class="col-md-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+            <div class="col-md-1" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                 <img src="{% static 'images/topics.png'%}" width="80px" style="border-radius: 50%;">
             </div>
-            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';">
+            <div class="col-md-10 ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{course.COURSE_ID}}/topic/{{topic.TOPIC_ID}}';" style="cursor:pointer;">
                 <div class="row  pt-2" >
                     <div class="col-6" >
                         <h4 style="color:#069">{{topic.TOPIC_NAME}}</h4>
@@ -456,28 +520,29 @@
             
         </div>
     </div>
-</div>
-<div style="width:1000px; margin:0 auto;">
-    <div class="collapse" id="collapseExample">
-        <h2 class="text-center my-2">Reviews</h2>
-        <div class="card card-body">
-            {% for review in reviews %}
-            <div class="row justify-content-start">
-                <div class="col-3">
-                    <div class="row ml-5 mb-2 align-items-center" onclick="window.location='/profile/{{review.USER_ID}}';"><i class="fa fa-user fa-2x rounded-circle"></i></div>
-                    <div class="row ml-1 align-items-end">{{review.FDATE}}</div>
-                </div>
-                <div class="col">
-                    <div class="row justify-content-between">
-                        <div class="col-9"><h5> <a href="{% url 'profile' review.USER_ID %}">{{review.NAME}}</a></h5></div>
-                        <div class="col"><h6>Ratting: {{review.RATTING}}</h6></div>
+    <div style="width:1000px; margin:0 auto;">
+        <div class="collapse" id="collapseExample">
+            <h2 class="text-center my-2">Reviews</h2>
+            <div class="card card-body">
+                {% for review in reviews %}
+                <div class="row justify-content-start">
+                    <div class="col-3">
+                        <div class="row ml-5 mb-2 align-items-center" onclick="window.location='/profile/{{review.USER_ID}}';" style="cursor:pointer;"><i class="fa fa-user fa-2x rounded-circle"></i></div>
+                        <div class="row ml-1 align-items-end">{{review.FDATE}}</div>
                     </div>
-                    <div class="row ml-1">{{review.REVIEW}}</div>
+                    <div class="col">
+                        <div class="row justify-content-between">
+                            <div class="col-9"><h5> <a href="{% url 'profile' review.USER_ID %}">{{review.NAME}}</a></h5></div>
+                            <div class="col"><h6>Ratting: {{review.RATTING}}</h6></div>
+                        </div>
+                        <div class="row ml-1">{{review.REVIEW}}</div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </div>
 </div>
+
 {% endblock %}
 {% endif %}

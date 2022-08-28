@@ -30,9 +30,8 @@
         <button type="button" class="btn btn-dark" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/next';">Next</button>
     </div>
 </div>
-
+{% if content.DESCRIPTION != NULL %}
 <div class="line"></div>
-
 <div class="mt-5"></div>
 <div style="width:1200px; margin:0 auto;">
     <p ><H3 class="text-dark font-weight-bold">DESCRIPTIONS</H3> </p>
@@ -40,5 +39,5 @@
         {{content.DESCRIPTION}}
     </p>
 </div>
-
+{% endif %}
 {% endblock %}

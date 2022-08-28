@@ -3,28 +3,78 @@
 {% if 'userid' in request.session %}
 {% block contain1 %}
     {% if owner == 1 %}
-        <div  style="width:300px; margin:0 auto;">
-            <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-            <h2 class="ml-3">{{ user.role }}</h2>
-            <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
-        </div>
-        <div  style="width:500px; margin:0 auto;">  
-            <p ><h5 >Email: {{ user.EMAIL }}  </h5></p>
+        <div style="width:1200px; margin:0 auto;">
+            <div class="mt-5"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+                </div>
+                
+            </div>
+            <div class="mt-3"></div>
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    <h2 class="ml-3">{{ user.role }}</h2>
+                </div>  
+            </div>
+            <div class="mt-5"></div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b>Name: </b>{{ user.NAME }}  </p> 
+                </div>  
+            </div>
+            <div class="row ">
+                <div class="col">
+                    <p class="text-dark display-6"><b >Email: </b>{{ user.EMAIL }}  </p>
+                </div>  
+            </div>    
         </div>
     {% else %}
-    <div  style="width:300px; margin:0 auto;">
-        <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-        <h2 class="ml-3">{{ user.role }}</h2>
-        <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+    <div style="width:1200px; margin:0 auto;">
+        <div class="mt-5"></div>
+        <div class="row justify-content-center">
+            <div class="col-3">
+                <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+            </div>
+            
+        </div>
+        <div class="mt-3"></div>
+        <div class="row justify-content-center">
+            <div class="col-3">
+                <h2 class="ml-3">{{ user.role }}</h2>
+            </div>  
+        </div>
+        <div class="mt-5"></div>
+        <div class="row ">
+            <div class="col">
+                <p class="text-dark display-6"><b>Name: </b>{{ user.NAME }}  </p> 
+            </div>  
+        </div>  
     </div>
     {% endif %}
 {% endblock %}
 {% else %}
 {% block contain2 %}
-<div  style="width:300px; margin:0 auto;">
-    <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
-    <h2 class="ml-3">{{ user.role }}</h2>
-    <p><h3 class="ml-3" style="color:blue">{{ user.NAME }} </h3> </p>    
+<div style="width:1200px; margin:0 auto;">
+    <div class="mt-5"></div>
+    <div class="row justify-content-center">
+        <div class="col-3">
+            <img class="ml-3" src="{% static 'images/anony.png'%}" width="120px" style="border-radius: 50%;">
+        </div>
+        
+    </div>
+    <div class="mt-3"></div>
+    <div class="row justify-content-center">
+        <div class="col-3">
+            <h2 class="ml-3">{{ user.role }}</h2>
+        </div>  
+    </div>
+    <div class="mt-5"></div>
+    <div class="row ">
+        <div class="col">
+            <p class="text-dark display-6"><b>Name: </b>{{ user.NAME }}  </p> 
+        </div>  
+    </div>  
 </div>
 {% endblock %}
 {% endif %}

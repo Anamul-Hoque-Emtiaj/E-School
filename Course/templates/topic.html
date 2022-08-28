@@ -156,7 +156,7 @@
 
         <li class="list-group-item list-group-item-action shadow">
             <div class="row">
-                <div class="col-lg-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+                <div class="col-lg-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';" style="cursor:pointer;">
                     {% if content.TYPE == 'lecture' %}
                     <img src="{% static 'images/lecture.png'%}" width="80px" >
                     {% else %}
@@ -166,18 +166,18 @@
                 {% if role == 'teacher' or role == 'contributer' %}
                 <div class="col-lg-1" >
                     <div class="row " >
-                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/up_content';">
+                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/up_content';" style="cursor:pointer;">
                             <i class="fa-solid fa-arrow-up"></i>
                         </button>
                     </div>
                     <div class="row " >
-                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/down_content';">
+                        <button type="button" class="btn btn-light" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}/down_content';" style="cursor:pointer;">
                             <i class="fa-solid fa-arrow-down"></i>
                         </button>
                     </div>
                 </div>
                 {% endif %}
-                <div class="col" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+                <div class="col" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';" style="cursor:pointer;">
                     <div class="row  pt-2" >
                         <div class="col-6" >
                             <h4 style="color:#069">{{content.NAME}}</h4>
@@ -250,14 +250,14 @@
         {% for content in contents %}
         <li class="list-group-item list-group-item-action shadow">
             <div class="row  ">
-            <div class="col-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+            <div class="col-1" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';" style="cursor:pointer;">
                 {% if content.TYPE == 'lecture' %}
                 <img src="{% static 'images/lecture.png'%}" width="80px" >
                 {% else %}
                 <img src="{% static 'images/ques1.png'%}" width="80px" >
                 {% endif %}
             </div>
-            <div class="col ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';">
+            <div class="col ml-4" style="padding-top: 0px;" onclick="window.location='/course/{{cid}}/topic/{{tid}}/content/{{content.CONTENT_ID}}';" style="cursor:pointer;">
                 <div class="row  pt-2" >
                     <div class="col-6" >
                         <h4 style="color:#069">{{content.NAME}}</h4>

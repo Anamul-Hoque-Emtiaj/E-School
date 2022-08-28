@@ -3,7 +3,8 @@
 {% if 'userid' in request.session %}
 {% block contain1 %}
 <div class="mt-5"></div>
-<div  style="width:900px; margin:0 auto;"> 
+<div  style="width:1000px; margin:0 auto;"> 
+    <h2 class="text-center my-5">Courses</h2>
     {% if request.session.role == 'admin' %}
     <table class="table table-hover">
         <thead class="thead-dark">
@@ -96,7 +97,8 @@
 {% else %}
 {% block contain2 %}
 <div class="mt-5"></div>
-<div  style="width:900px; margin:0 auto;"> 
+<div  style="width:1000px; margin:0 auto;"> 
+    <h2 class="text-center my-5">Courses</h2>
     <ul class="list-group list-group-flush">
         {% for course in courses %}
         {% if course.APPROVED == 1 %}
