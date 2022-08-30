@@ -9,7 +9,7 @@
 
     .heading h1 {
       text-align: center;
-      font-size: 80px;
+      font-size: 50px;
       color: rgb(240, 181, 247);
       margin-top: 150px;
      
@@ -18,16 +18,25 @@
     }
     .heading h4 {
       text-align: center;
-      font-size: 40px;
+      font-size: 30px;
       color: rgb(246, 235, 235);
       margin-top: 20px;
     }
 
     .heading h3 {
-      text-align: end;
-      font-size: 35px;
+      text-align: center;
+      font-size: 30px;
       color: rgb(255, 255, 234);
       margin-bottom: 180px;
+      margin-top: 15px;
+
+    }
+
+    .heading h5 {
+      text-align: center;
+      font-size: 30px;
+      color: rgb(255, 255, 234);
+      margin-bottom: 110px;
       margin-top: 15px;
 
     }
@@ -79,12 +88,29 @@
 {% block contain1 %}
 <div style="width:1200px; margin:0 auto;">
     <section id="features1" class="text-center">
-        <div class="heading sm-12">
-          <h1>{{ course.TITLE }}</h1>
-          
-          <h4 class="text-center">{{ course.NUM_OF_STUDENTS }} Students </h4>
-          <h3 class="text-center">{{ course.RATTING }} Rattings</h3>
+        <div class="row heading">
+            <h1>{{ course.TITLE }}</h1>
         </div>
+        <div class="row heading">
+            <h4 class="text-center">{{ course.NUM_OF_STUDENTS }} Students </h4>
+        </div>
+          {% if role == 'student' %}
+          <div class="row heading">
+                <h4 class="text-center">{{ course.RATTING }} Rattings</h4>
+           </div>
+           <div class="row heading">
+                <h5>
+                    <button type="button" class="btn btn-primary" onclick="window.location='/course/{{course.COURSE_ID}}/enroll/{{request.session.userid}}';">
+                        Enroll now
+                    </button>
+              </h5>
+            </div>
+          {% else %}
+          <div class="row heading">
+            <h3 class="text-center">{{ course.RATTING }} Rattings</h3>
+          </div>
+          {% endif %}
+          
     </section>
     <div class="my-5">
         <h3>Descriptions</h3>

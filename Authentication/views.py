@@ -9,7 +9,28 @@ from Utils.HashPass import passlib_encryption, passlib_encryption_verify
 from Utils.fetcher import *
 
 # Create your views here.
+def notiCount(request):
+    role = request.session["role"]
+    user_id = request.session["userid"]
+    with connections['eschool_db'].cursor() as c:
+        if role == 'student':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'teacher':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION 
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ORDER BY ID DESC''', [user_id,user_id,user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'admin':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE (U_ID = %s OR "FOR" = 'admin') AND SEEN = 0 ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
 def home(request):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('SELECT * FROM "Courses" WHERE APPROVED = 1 ORDER BY RATTING DESC,NUM_OF_STUDENTS DESC,COURSE_ID ASC ')
         course1=dictfetchall(c)
@@ -104,6 +125,7 @@ def logout(request):
 
 
 def all_teachers(request):
+     notiCount(request)
      with connections['eschool_db'].cursor() as c:
         c.execute('SELECT * from "Users","Teachers" Where USER_ID = T_ID order by COURSE_TAKEN desc,T_ID ASC ')
         users=dictfetchall(c)       
@@ -116,6 +138,7 @@ def all_students(request):
     return render(request,'all_students.html',{'users':users}) 
 
 def all_courses(request,sortedBy):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         if sortedBy == 'popular':
             c.execute('SELECT * FROM "Courses" ORDER BY NUM_OF_STUDENTS DESC,RATTING DESC,COURSE_ID ASC ')
@@ -129,6 +152,7 @@ def all_courses(request,sortedBy):
     return render(request,'all_courses.html',{'courses':courses}) 
 
 def delete_user(request,user_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         pas = request.POST["password"]
         c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [request.session["userid"]])
@@ -144,6 +168,7 @@ def delete_user(request,user_id):
         return redirect(all_students)
 
 def search_courses(request):
+    notiCount(request)
     if request.method=='POST':
         tmp = request.POST['search']
         searchkey = '%' + tmp + '%'

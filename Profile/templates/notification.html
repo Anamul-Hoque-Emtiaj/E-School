@@ -1,6 +1,164 @@
 {% extends 'base.html' %}
-{% block contain %}
-<div class="container">
-    from notification
+{% block contain1 %}
+<div  style="width:900px; margin:0 auto;">
+    <h2 class="text-center m-5">Notifications</h2>
+    <div class="row justify-content-end">
+        <div class="col-2">
+            <select class="custom-select" name="op" id="op">
+                <option value="unseen" selected>Unseen</option>
+                <option value="seen">Seen</option>
+                <option value="all">All</option>
+            </select>
+        </div>
+    </div>
+    <div class="mt-3"></div>
+    <div id="unseen">
+        {% if newNotif.0 %}
+            {% for notification in newNotif %}
+                {% if notification.FOR == 'admin' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/admin/course_approval';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course approval request appears</p>
+                </div>
+                {% elif notification.FOR == 'accept' or notification.FOR == 'teacher1' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}';" style="cursor:pointer;">
+                    {% if notification.FOR == 'accept' %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your enrollment request is accepted</p>
+                    {% else %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your course is approved by an admin</p>
+                    {% endif %}
+                </div>
+                {% elif notification.FOR == 'teacher3' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/{{request.session.userid}}/approve_student';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course enrollment request appears</p>
+                </div>
+                {% else %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}/forum';" style="cursor:pointer;">
+                    {% if notification.FOR == 'reply' %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone replied to your comment</p>
+                    {% else %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone posted new comment</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <h5>No New Notifications Found</h5>
+        {% endif %}
+    </div>
+    <div id="seen" style="display: none;">
+        {% if prevNotif.0 %}
+        {% for notification in prevNotif %}
+                {% if notification.FOR == 'admin' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/admin/course_approval';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course approval request appears</p>
+                </div>
+                {% elif notification.FOR == 'accept' or notification.FOR == 'teacher1' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}';" style="cursor:pointer;">
+                    {% if notification.FOR == 'accept' %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your enrollment request is accepted</p>
+                    {% else %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your course is approved by an admin</p>
+                    {% endif %}
+                </div>
+                {% elif notification.FOR == 'teacher3' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/{{request.session.userid}}/approve_student';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course enrollment request appears</p>
+                </div>
+                {% else %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}/forum';" style="cursor:pointer;">
+                    {% if notification.FOR == 'reply' %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone replied to your comment</p>
+                    {% else %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone posted new comment</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <h5>No Notifications Found</h5>
+        {% endif %}
+    </div>
+    <div id="all" style="display: none;">
+        {% if newNotif.0 %}
+        <h6 class="text-center">New</h6>
+        {% for notification in newNotif %}
+                {% if notification.FOR == 'admin' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/admin/course_approval';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course approval request appears</p>
+                </div>
+                {% elif notification.FOR == 'accept' or notification.FOR == 'teacher1' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}';" style="cursor:pointer;">
+                    {% if notification.FOR == 'accept' %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your enrollment request is accepted</p>
+                    {% else %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your course is approved by an admin</p>
+                    {% endif %}
+                </div>
+                {% elif notification.FOR == 'teacher3' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/{{request.session.userid}}/approve_student';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course enrollment request appears</p>
+                </div>
+                {% else %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}/forum';" style="cursor:pointer;">
+                    {% if notification.FOR == 'reply' %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone replied to your comment</p>
+                    {% else %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone posted new comment</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% if prevNotif.0 %}
+            <h6 class="text-center">Previous</h6>
+            {% for notification in prevNotif %}
+                {% if notification.FOR == 'admin' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/admin/course_approval';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course approval request appears</p>
+                </div>
+                {% elif notification.FOR == 'accept' or notification.FOR == 'teacher1' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}';" style="cursor:pointer;">
+                    {% if notification.FOR == 'accept' %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your enrollment request is accepted</p>
+                    {% else %}
+                        <p class="mt-1 text-center text-light font-weight-bold">Your course is approved by an admin</p>
+                    {% endif %}
+                </div>
+                {% elif notification.FOR == 'teacher3' %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/profile/{{request.session.userid}}/approve_student';" style="cursor:pointer;">
+                    <p class="mt-1 text-center text-light font-weight-bold">New Course enrollment request appears</p>
+                </div>
+                {% else %}
+                <div class="row p-2 bg-secondary m-1" onclick="window.location='/course/{{notification.KEY}}/forum';" style="cursor:pointer;">
+                    {% if notification.FOR == 'reply' %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone replied to your comment</p>
+                    {% else %}
+                    <p class="mt-1 text-center text-light font-weight-bold">Someone posted new comment</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% else %}
+                <h5>No Notifications Found</h5>
+            {% endif %}
+        {% endif %}
+    </div>
 </div>
+{% endblock %}
+{% block jsb %}
+<script>
+
+    let current = document.getElementById(document.getElementById('op').value);
+
+    function changeSelect (idDivName) {
+        current.style.display = 'none';
+        current = document.getElementById(idDivName);
+        current.style.display = 'block';
+    }
+
+    document.getElementById('op').addEventListener('change', function() {
+        changeSelect(this.value);
+    });
+
+</script>
 {% endblock %}

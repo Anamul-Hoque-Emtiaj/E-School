@@ -8,7 +8,8 @@ create table "Users"
             primary key,
     NAME     VARCHAR2(50)                       not null,
     EMAIL    VARCHAR2(50)                       not null,
-    PASSWORD VARCHAR2(50)                       not null
+    PASSWORD VARCHAR2(1000)                     not null,
+    RDATE    DATE   default sysdate
 )
 /
 
@@ -61,17 +62,19 @@ create unique index COURSES_TITLE_UINDEX
 
 create table "Enrollment"
 (
-    ENROLL_ID NUMBER default ESCHOOL.SEQ.nextval not null
+    ENROLL_ID  NUMBER       default ESCHOOL.SEQ.nextval not null
         constraint ENROLLMENT_PK
             primary key,
-    S_ID      NUMBER                             not null
+    S_ID       NUMBER                                   not null
         constraint ENROLLMENT_STUDENTS_S_ID_FK
             references "Students",
-    COURSE_ID NUMBER                             not null
+    COURSE_ID  NUMBER                                   not null
         constraint ENROLLMENT_COURSES_COURSE_ID_FK
             references "Courses",
-    "Date"    DATE   default CURRENT_DATE,
-    APPROVED  NUMBER default 0                   not null
+    "Date"     DATE         default CURRENT_DATE,
+    ISAPPROVED NUMBER       default 0                   not null,
+    PROGRESS   VARCHAR2(10) default '0',
+    AVG_MARK   VARCHAR2(10) default 0
 )
 /
 
@@ -86,7 +89,7 @@ create trigger DELETE_ENROLLMENT
 DECLARE
 
 BEGIN
-    IF :OLD.APPROVED=1 THEN
+    IF :OLD.ISAPPROVED=1 THEN
         UPDATE "Students"
         SET COURSE_ENROLLED = COURSE_ENROLLED-1
         WHERE S_ID = :OLD.S_ID;
@@ -129,10 +132,6 @@ create table "Topics"
 )
 /
 
-create unique index TOPICS_SERIAL_UINDEX
-    on "Topics" (SERIAL)
-/
-
 create trigger TOPIC_CONTROL
     before insert
     on "Topics"
@@ -158,12 +157,9 @@ create table "Contents"
     TOPIC_ID   NUMBER                             not null
         constraint CONTENTS_TOPICS_TOPIC_ID_FK
             references "Topics",
-    SERIAL     NUMBER default ESCHOOL.SEQ.nextval not null
+    SERIAL     NUMBER default ESCHOOL.SEQ.nextval not null,
+    TYPE       VARCHAR2(500)
 )
-/
-
-create unique index CONTENTS_SERIAL_UINDEX
-    on "Contents" (SERIAL)
 /
 
 create table "Lecture"
@@ -193,65 +189,22 @@ create table "Quizs"
 
 create table "Questions"
 (
-    Q_ID        NUMBER default ESCHOOL.SEQ.nextval not null
+    Q_ID     NUMBER default ESCHOOL.SEQ.nextval not null
         constraint QUESTIONS_PK
             primary key,
-    E_ID        NUMBER                             not null
+    E_ID     NUMBER                             not null
         constraint QUESTIONS_QUIZS_E_ID_FK
             references "Quizs",
-    "Questions" VARCHAR2(300)                      not null,
-    OP1         VARCHAR2(100),
-    OP2         VARCHAR2(100),
-    OP3         VARCHAR2(100),
-    OP4         VARCHAR2(100),
-    RA          VARCHAR2(200)                      not null,
-    NUM         NUMBER default 1                   not null,
-    SERIAL      NUMBER default ESCHOOL.SEQ.nextval not null,
-    TYPE        VARCHAR2(50)                       not null
+    QUESTION VARCHAR2(300)                      not null,
+    OP1      VARCHAR2(100),
+    OP2      VARCHAR2(100),
+    OP3      VARCHAR2(100),
+    OP4      VARCHAR2(100),
+    RA       VARCHAR2(200)                      not null,
+    NUM      NUMBER default 1                   not null,
+    SERIAL   NUMBER default ESCHOOL.SEQ.nextval not null,
+    TYPE     VARCHAR2(50)                       not null
 )
-/
-
-create unique index QUESTIONS_SERIAL_UINDEX
-    on "Questions" (SERIAL)
-/
-
-create trigger QUESTION_INSERTION
-    after insert
-    on "Questions"
-    for each row
-DECLARE
-
-BEGIN
-    update "Quizs" Q
-    set  Q.MARKS = Q.MARKS + :NEW.NUM, Q.NUM_OF_QUESTIONS = Q.NUM_OF_QUESTIONS + 1
-    WHERE Q.E_ID  = :NEW.E_ID;
-end;
-/
-
-create trigger DELETE_QUESTION
-    before delete
-    on "Questions"
-    for each row
-DECLARE
-
-BEGIN
-    UPDATE "Quizs" Q
-    SET Q.NUM_OF_QUESTIONS = Q.NUM_OF_QUESTIONS-1, Q.MARKS = Q.MARKS - :OLD.NUM
-    WHERE Q.E_ID = :OLD.E_ID;
-end;
-/
-
-create trigger UPDATE_QUESTION
-    after update
-    on "Questions"
-    for each row
-DECLARE
-
-BEGIN
-    update "Quizs" Q
-    set  Q.MARKS = Q.MARKS + :NEW.NUM - :OLD.NUM
-    WHERE Q.E_ID  = :NEW.E_ID;
-end;
 /
 
 create table "Take_Exams"
@@ -267,8 +220,60 @@ create table "Take_Exams"
         constraint TAKE_EXAMS_QUIZS_E_ID_FK
             references "Quizs"
                 on delete cascade,
-    OBTAINED_MARKS NUMBER                             not null
+    OBTAINED_MARKS NUMBER                             not null,
+    C_ID           NUMBER,
+    STATUS         NUMBER default 0
 )
+/
+
+create trigger QUESTION_INSERTION
+    after insert
+    on "Questions"
+    for each row
+DECLARE
+
+BEGIN
+    update "Quizs" Q
+    set  Q.MARKS = Q.MARKS + :NEW.NUM, Q.NUM_OF_QUESTIONS = Q.NUM_OF_QUESTIONS + 1
+    WHERE Q.E_ID  = :NEW.E_ID;
+
+    DELETE 
+    FROM "Take_Exams"
+    WHERE "Take_Exams".E_ID = :NEW.E_ID;
+end;
+/
+
+create trigger DELETE_QUESTION
+    before delete
+    on "Questions"
+    for each row
+DECLARE
+
+BEGIN
+    UPDATE "Quizs" Q
+    SET Q.NUM_OF_QUESTIONS = Q.NUM_OF_QUESTIONS-1, Q.MARKS = Q.MARKS - :OLD.NUM
+    WHERE Q.E_ID = :OLD.E_ID;
+    DELETE 
+    FROM "Take_Exams"
+    WHERE "Take_Exams".E_ID = :OLD.E_ID;
+end;
+/
+
+create trigger UPDATE_QUESTION
+    after update
+    on "Questions"
+    for each row
+DECLARE
+
+BEGIN
+    update "Quizs" Q
+    set  Q.MARKS = Q.MARKS + :NEW.NUM - :OLD.NUM
+    WHERE Q.E_ID  = :NEW.E_ID;
+
+    DELETE
+    FROM "Take_Exams"
+    WHERE "Take_Exams".E_ID = :NEW.E_ID;
+end;
 /
 
 create trigger EXAM_CONTROL
@@ -287,11 +292,28 @@ BEGIN
 
     SELECT COURSE_ID INTO C FROM "Topics" WHERE TOPIC_ID = T;
 
-    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID AND E.APPROVED=0;
+    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID AND E.ISAPPROVED=0;
     SELECT COUNT(*) INTO C4 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID;
     IF C3>0 OR C4<1 THEN
         RAISE_APPLICATION_ERROR(-150, 'Student did not enrolled yet');
     end if;
+end;
+/
+
+create trigger FIND_COURSE_ID
+    before insert
+    on "Take_Exams"
+    for each row
+DECLARE
+    CID NUMBER;
+    TID NUMBER;
+BEGIN
+    SELECT TOPIC_ID INTO TID FROM "Contents" WHERE CONTENT_ID = :NEW.E_ID;
+
+    SELECT COURSE_ID INTO CID FROM "Topics" WHERE TOPIC_ID = TID;
+
+    :NEW.C_ID := CID;
+
 end;
 /
 
@@ -310,7 +332,8 @@ create table "Forums"
         constraint FORUMS_FORUMS_F_ID_FK
             references "Forums",
     DESCRIPTION VARCHAR2(1000)                           not null,
-    "DATE"      TIMESTAMP(6) default CURRENT_TIMESTAMP
+    "DATE"      TIMESTAMP(6) default CURRENT_TIMESTAMP,
+    CHILD       NUMBER       default 0
 )
 /
 
@@ -342,7 +365,7 @@ BEGIN
         SELECT T_ID INTO T1  FROM "Teachers" WHERE T_ID = :NEW.U_ID;
         SELECT T_ID INTO T2  FROM "Courses" WHERE COURSE_ID = :NEW.C_ID;
         IF T1 != T2 THEN
-            SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.U_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID AND E.APPROVED=0;
+            SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.U_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID AND E.ISAPPROVED=0;
             SELECT COUNT(*) INTO C4 FROM "Enrollment" E WHERE :NEW.U_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID;
             IF C3>0 OR C4<1 THEN
                 RAISE_APPLICATION_ERROR(-150, 'Student did not enrolled yet');
@@ -363,8 +386,8 @@ create table "Notifications"
                 on delete cascade,
     SEEN   NUMBER       default 0                   not null,
     "DATE" TIMESTAMP(6) default CURRENT_TIMESTAMP   not null,
-    KEY    NUMBER       default null                not null,
-    "FOR"  VARCHAR2(50)                             not null
+    KEY    NUMBER       default null,
+    "FOR"  VARCHAR2(50)
 )
 /
 
@@ -378,6 +401,7 @@ create table "Feedback"
             references "Courses",
     RATTING VARCHAR2(10) default null not null,
     REVIEW  VARCHAR2(250),
+    FDATE   TIMESTAMP(6) default SYSTIMESTAMP,
     constraint FEEDBACK_PK
         primary key (S_ID, C_ID)
 )
@@ -402,7 +426,7 @@ BEGIN
         RAISE_APPLICATION_ERROR(-156, 'Course did not approved yet');
     end if;
 
-    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID AND E.APPROVED=0;
+    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID AND E.ISAPPROVED=0;
     SELECT COUNT(*) INTO C4 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND :NEW.C_ID = E.COURSE_ID;
     IF C3>0 OR C4<1 THEN
         RAISE_APPLICATION_ERROR(-150, 'Student did not enrolled yet');
@@ -441,7 +465,7 @@ BEGIN
 
     SELECT COURSE_ID INTO C FROM "Topics" WHERE TOPIC_ID = T;
 
-    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID AND E.APPROVED=0;
+    SELECT COUNT(*) INTO C3 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID AND E.ISAPPROVED=0;
     SELECT COUNT(*) INTO C4 FROM "Enrollment" E WHERE :NEW.S_ID = E.S_ID AND C = E.COURSE_ID;
     IF C3>0 OR C4<1 THEN
         RAISE_APPLICATION_ERROR(-150, 'Student did not enrolled yet');
@@ -504,6 +528,16 @@ BEGIN
     WHERE S.T_ID = :OLD.T_ID;
 
 end;
+/
+
+create table DJANGO_MIGRATIONS
+(
+    ID      NUMBER(19) generated by default on null as identity
+        primary key,
+    APP     NVARCHAR2(255),
+    NAME    NVARCHAR2(255),
+    APPLIED TIMESTAMP(6) not null
+)
 /
 
 create PROCEDURE UPDATE_RATTING(ID IN NUMBER) IS
@@ -580,46 +614,53 @@ BEGIN
 end;
 /
 
-create PROCEDURE DELETE_COURSE(ID IN NUMBER) IS
-    CURSOR C1 IS SELECT * FROM "Forums" WHERE C_ID = ID;
-    CURSOR C2 IS SELECT * FROM "Topics" WHERE COURSE_ID = ID;
-
+create PROCEDURE DELETE_COURSE(CID IN NUMBER) IS
+    CURSOR C1 IS SELECT * FROM "Forums" WHERE C_ID = CID;
+    CURSOR C2 IS SELECT * FROM "Topics" WHERE COURSE_ID = CID;
+    F NUMBER;
 BEGIN
-    FOR C IN C1
-    LOOP
-        DELETE_FORUM(C.F_ID);
-    end loop;
-
-    FOR C IN C2
-    LOOP
-        DELETE_TOPIC(C.TOPIC_ID);
-    end loop;
-
-    DELETE
-    FROM "Feedback"
-    WHERE C_ID = ID;
-
-    DELETE
-    FROM "Enrollment"
-    WHERE COURSE_ID = ID;
-
-    DELETE
-    FROM "Contribute"
-    WHERE C_ID= ID;
-
-    UPDATE "Teachers" T
-    SET T.COURSE_TAKEN = T.COURSE_TAKEN -1
-    WHERE T.T_ID = (SELECT T_ID
-                    FROM "Courses"
-                    WHERE COURSE_ID = ID);
-
-    DELETE
-    FROM "Notifications" N
-    WHERE N.KEY = ID;
-
-    DELETE
-    FROM "Courses"
-    WHERE COURSE_ID = ID;
+    SELECT APPROVED INTO F FROM "Courses" WHERE COURSE_ID = CID;
+    IF F=1 THEN 
+        FOR C IN C1
+        LOOP
+            DELETE_FORUM(C.F_ID);
+        end loop;
+    
+        FOR C IN C2
+        LOOP
+            DELETE_TOPIC(C.TOPIC_ID);
+        end loop;
+    
+        DELETE
+        FROM "Feedback"
+        WHERE C_ID = CID;
+    
+        DELETE
+        FROM "Enrollment"
+        WHERE COURSE_ID = CID;
+    
+        DELETE
+        FROM "Contribute"
+        WHERE C_ID= CID;
+    
+        UPDATE "Teachers" T
+        SET T.COURSE_TAKEN = T.COURSE_TAKEN -1
+        WHERE T.T_ID = (SELECT T_ID
+                        FROM "Courses"
+                        WHERE COURSE_ID = CID);
+    
+        DELETE
+        FROM "Notifications" N
+        WHERE N.ID IN (SELECT N2.ID FROM "Notifications" N2 WHERE N2.KEY = CID);
+    
+        DELETE
+        FROM "Courses"
+        WHERE COURSE_ID = CID;
+    ElSE
+        DELETE
+        FROM "Courses"
+        WHERE COURSE_ID = CID;
+    END IF;
 end;
 /
 
@@ -669,6 +710,10 @@ BEGIN
         DELETE_FORUM(C.F_ID);
     end loop;
 
+    DELETE 
+    FROM "Notifications"
+    WHERE U_ID = ID;
+    
     DELETE
     FROM "Users"
     WHERE USER_ID = ID;
@@ -699,8 +744,8 @@ end;
 create PROCEDURE REEJECTED_COURSE(ID IN NUMBER) IS
  
 BEGIN
-    DELETE
-    FROM "Courses"
+    UPDATE "Courses"
+    SET APPROVED = -1
     WHERE COURSE_ID = ID;
 end;
 /
@@ -708,8 +753,8 @@ end;
 create PROCEDURE REEJECTED_STUDENT(SID IN NUMBER,C_ID IN NUMBER) IS
 
 BEGIN
-    DELETE
-    FROM "Enrollment"
+    UPDATE "Enrollment"
+    SET ISAPPROVED = -1
     WHERE COURSE_ID = C_ID AND S_ID = SID;
 end;
 /
@@ -718,7 +763,7 @@ create PROCEDURE APPROVED_STUDENT(SID IN NUMBER,C_ID IN NUMBER) IS
     IS_APRV NUMBER;
 
 BEGIN
-    SELECT APPROVED INTO IS_APRV FROM "Enrollment" WHERE S_ID = SID AND COURSE_ID = C_ID;
+    SELECT ISAPPROVED INTO IS_APRV FROM "Enrollment" WHERE S_ID = SID AND COURSE_ID = C_ID;
     IF IS_APRV=0 THEN
         UPDATE "Students" S
         SET S.COURSE_ENROLLED = S.COURSE_ENROLLED + 1
@@ -729,22 +774,79 @@ BEGIN
         WHERE C.COURSE_ID = C_ID;
 
         UPDATE "Enrollment"
-        SET APPROVED = 1
+        SET ISAPPROVED = 1
         WHERE S_ID = SID AND COURSE_ID = C_ID;
     end if;
 end;
 /
 
-create FUNCTION DO_LOGIN(MAIL IN VARCHAR2, PASS IN VARCHAR2, UID OUT NUMBER)
+create FUNCTION DO_LOGIN(MAIL IN VARCHAR2, UID OUT NUMBER)
+    RETURN VARCHAR2 AS
+    C1 NUMBER;
+    C2 NUMBER;
+BEGIN
+    SELECT USER_ID INTO UID FROM "Users" WHERE EMAIL = MAIL;
+    SELECT COUNT(*) INTO C1 FROM "Students" WHERE S_ID = UID;
+    SELECT COUNT(*) INTO C2 FROM "Teachers" WHERE T_ID = UID;
+    IF C1 > 0 THEN
+        RETURN 'student';
+    ELSE
+        IF C2 > 0 THEN
+            RETURN 'teacher';
+        ELSE
+            RETURN 'admin';
+        end if;
+    end if;
+end;
+/
+
+create FUNCTION REGISTER_STUDENT(NAM IN VARCHAR2, MAIL IN VARCHAR2, PASS IN VARCHAR2,  SID OUT NUMBER)
+    RETURN VARCHAR2 AS
+
+    C NUMBER;
+
+BEGIN
+    SELECT COUNT(*) INTO C FROM "Users" WHERE EMAIL = MAIL ;
+    IF C>0 THEN
+        SID := -1;
+        RETURN 'Email already exist';
+    ELSE
+        INSERT INTO "Users"(name, email, password) values(NAM, MAIL,PASS);
+        SELECT USER_ID INTO SID FROM "Users" WHERE MAIL = EMAIL;
+        INSERT INTO "Students"(S_ID) VALUES (SID);
+        RETURN 'Successfull';
+    end if;
+end;
+/
+
+create FUNCTION REGISTER_TEACHER(NAM IN VARCHAR2, MAIL IN VARCHAR2, PASS IN VARCHAR2,  DESIG IN VARCHAR2 ,TID OUT NUMBER)
+    RETURN VARCHAR2 AS
+
+    C NUMBER;
+
+BEGIN
+    SELECT COUNT(*) INTO C FROM "Users" WHERE EMAIL = MAIL ;
+    IF C>0 THEN
+        TID := -1;
+        RETURN 'Email already exist';
+    ELSE
+        INSERT INTO "Users"(name, email, password) values(NAM, MAIL,PASS);
+        SELECT USER_ID INTO TID FROM "Users" WHERE MAIL = EMAIL;
+        INSERT INTO "Teachers"(T_ID, DESIGNATION) VALUES (TID,DESIG);
+        RETURN 'Successfull';
+    end if;
+end;
+/
+
+create FUNCTION CHECK_USER(UID IN NUMBER)
     RETURN VARCHAR2 AS
 
     C NUMBER;
     C1 NUMBER;
     C2 NUMBER;
 BEGIN
-    SELECT COUNT(*) INTO C FROM "Users" WHERE EMAIL = MAIL AND PASSWORD = PASS;
+    SELECT COUNT(*) INTO C FROM "Users" WHERE USER_ID = UID;
     IF C>0 THEN
-        SELECT USER_ID INTO UID FROM "Users" WHERE EMAIL = MAIL AND PASSWORD = PASS;
         SELECT COUNT(*) INTO C1 FROM "Students" WHERE S_ID = UID;
         SELECT COUNT(*) INTO C2 FROM "Teachers" WHERE T_ID = UID;
         IF C1 > 0 THEN
@@ -757,57 +859,145 @@ BEGIN
             end if;
         end if;
     ELSE
-        UID := -1;
-        RETURN 'Invalid Email or Password given!';
+        RETURN 'Invalid User';
     end if;
 end;
 /
 
-create FUNCTION REGISTER_STUDENT(NAM IN VARCHAR2, MAIL IN VARCHAR2, PASS IN VARCHAR2,  CPASS IN VARCHAR2, SID OUT NUMBER)
-    RETURN VARCHAR2 AS
-
-    C NUMBER;
-
+create PROCEDURE UPDATE_PROGRESS(SID IN NUMBER, CID IN NUMBER) IS
+    NC NUMBER;
+    NL NUMBER;
+    NE NUMBER;
+    MRK NUMBER;
+    TMRK VARCHAR2(15);
+    OMRK VARCHAR2(15);
+    CURSOR DATA IS SELECT * FROM "Take_Exams" WHERE S_ID = SID AND E_ID IN (SELECT CONTENT_ID  FROM "Contents" WHERE TOPIC_ID IN ( SELECT TOPIC_ID FROM "Topics" WHERE COURSE_ID = CID ));
 BEGIN
-    IF PASS = CPASS THEN
-        SELECT COUNT(*) INTO C FROM "Users" WHERE EMAIL = MAIL ;
-        IF C>0 THEN
-            SID := -1;
-            RETURN 'Email already exist';
-        ELSE
-            INSERT INTO "Users"(name, email, password) values(NAM, MAIL,PASS);
-            SELECT USER_ID INTO SID FROM "Users" WHERE MAIL = EMAIL;
-            INSERT INTO "Students"(S_ID) VALUES (SID);
-            RETURN 'Successfull';
-        end if;
-    ELSE
-          SID := -1;
-        RETURN 'Password didnot match';
+    SELECT COUNT(CONTENT_ID) INTO NC FROM "Contents" WHERE TOPIC_ID IN (
+        SELECT TOPIC_ID FROM "Topics" WHERE COURSE_ID = CID
+        );
+    SELECT COUNT(L_ID) INTO NL FROM "Completion" WHERE S_ID = SID AND
+    L_ID IN (SELECT CONTENT_ID  FROM "Contents" WHERE TOPIC_ID IN (
+        SELECT TOPIC_ID FROM "Topics" WHERE COURSE_ID = CID
+        ));
+    NE := 0;
+    TMRK := 0;
+    OMRK := 0;
+
+     FOR E IN DATA
+        LOOP
+            SELECT MARKS INTO MRK FROM "Quizs" WHERE E_ID = E.E_ID;
+            OMRK := OMRK + E.OBTAINED_MARKS;
+            TMRK := TMRK + MRK;
+            IF E.OBTAINED_MARKS*2>=MRK THEN
+                NE := NE+1;
+            end if;
+    end loop;
+
+    if NC>0 THEN
+        UPDATE "Enrollment"
+        SET PROGRESS = round(((NE+NL)/NC)*100,2)
+        WHERE S_ID = SID AND COURSE_ID = CID;
+    end if;
+
+    if TMRK>0 then
+        UPDATE "Enrollment"
+        SET AVG_MARK = ROUND((OMRK/TMRK)*100,2)
+        WHERE S_ID = SID AND COURSE_ID = CID;
     end if;
 end;
 /
 
-create FUNCTION REGISTER_TEACHER(NAM IN VARCHAR2, MAIL IN VARCHAR2, PASS IN VARCHAR2,  CPASS IN VARCHAR2, DESIG IN VARCHAR2 ,TID OUT NUMBER)
-    RETURN VARCHAR2 AS
-
-    C NUMBER;
+create PROCEDURE UP(ID IN NUMBER, FID IN NUMBER, F IN VARCHAR2) AS
+    S1 NUMBER;
+    S2 NUMBER;
+    ID2 NUMBER;
+    CNT NUMBER;
 
 BEGIN
-    IF PASS = CPASS THEN
-        SELECT COUNT(*) INTO C FROM "Users" WHERE EMAIL = MAIL ;
-        IF C>0 THEN
-            TID := -1;
-            RETURN 'Email already exist';
-        ELSE
-            INSERT INTO "Users"(name, email, password) values(NAM, MAIL,PASS);
-            SELECT USER_ID INTO TID FROM "Users" WHERE MAIL = EMAIL;
-            INSERT INTO "Teachers"(T_ID, DESIGNATION) VALUES (TID,DESIG);
-            RETURN 'Successfull';
+    IF F = 'T' THEN
+        SELECT SERIAL INTO S1 FROM "Topics" WHERE TOPIC_ID = ID;
+        SELECT COUNT(TOPIC_ID) INTO  CNT FROM "Topics" WHERE COURSE_ID = FID AND SERIAL<S1;
+        IF CNT>0 THEN
+            SELECT MAX(SERIAL) INTO S2 FROM "Topics" WHERE COURSE_ID = FID AND SERIAL<S1;
+            SELECT TOPIC_ID INTO ID2 FROM "Topics" WHERE COURSE_ID = FID AND SERIAL = S2;
+            UPDATE "Topics" SET SERIAL = S1 WHERE TOPIC_ID = ID2;
+            UPDATE "Topics" SET SERIAL = S2 WHERE TOPIC_ID = ID;
+        end if;
+    ELSIF F = 'C' THEN
+        SELECT SERIAL INTO S1 FROM "Contents" WHERE CONTENT_ID = ID;
+        SELECT COUNT(CONTENT_ID) INTO  CNT FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL<S1;
+        IF CNT>0 THEN
+            SELECT MAX(SERIAL) INTO S2 FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL<S1;
+            SELECT CONTENT_ID INTO ID2 FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL = S2;
+            UPDATE "Contents" SET SERIAL = S1 WHERE CONTENT_ID = ID2;
+            UPDATE "Contents" SET SERIAL = S2 WHERE CONTENT_ID = ID;
         end if;
     ELSE
-          TID := -1;
-        RETURN 'Password didnot match';
+        SELECT SERIAL INTO S1 FROM "Questions" WHERE Q_ID = ID;
+        SELECT COUNT(Q_ID) INTO  CNT FROM "Questions" WHERE E_ID = FID AND SERIAL<S1;
+        IF CNT>0 THEN
+            SELECT MAX(SERIAL) INTO S2 FROM "Questions" WHERE E_ID = FID AND SERIAL<S1;
+            SELECT Q_ID INTO ID2 FROM "Questions" WHERE E_ID = FID AND SERIAL = S2;
+            UPDATE "Questions" SET SERIAL = S1 WHERE Q_ID = ID2;
+            UPDATE "Questions" SET SERIAL = S2 WHERE Q_ID = ID;
+        end if;
     end if;
+end;
+/
+
+create PROCEDURE DOWN(ID IN NUMBER, FID IN NUMBER, F IN VARCHAR2) AS
+    S1 NUMBER;
+    S2 NUMBER;
+    ID2 NUMBER;
+    CNT NUMBER;
+
+BEGIN
+    IF F = 'T' THEN
+        SELECT SERIAL INTO S1 FROM "Topics" WHERE TOPIC_ID = ID;
+        SELECT COUNT(TOPIC_ID) INTO  CNT FROM "Topics" WHERE COURSE_ID = FID AND SERIAL>S1;
+        IF CNT>0 THEN
+            SELECT MIN(SERIAL) INTO S2 FROM "Topics" WHERE COURSE_ID = FID AND SERIAL>S1;
+            SELECT TOPIC_ID INTO ID2 FROM "Topics" WHERE COURSE_ID = FID AND SERIAL = S2;
+            UPDATE "Topics" SET SERIAL = S1 WHERE TOPIC_ID = ID2;
+            UPDATE "Topics" SET SERIAL = S2 WHERE TOPIC_ID = ID;
+        end if;
+    ELSIF F = 'C' THEN
+        SELECT SERIAL INTO S1 FROM "Contents" WHERE CONTENT_ID = ID;
+        SELECT COUNT(CONTENT_ID) INTO  CNT FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL>S1;
+        IF CNT>0 THEN
+            SELECT MIN(SERIAL) INTO S2 FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL>S1;
+            SELECT CONTENT_ID INTO ID2 FROM "Contents" WHERE TOPIC_ID = FID AND SERIAL = S2;
+            UPDATE "Contents" SET SERIAL = S1 WHERE CONTENT_ID = ID2;
+            UPDATE "Contents" SET SERIAL = S2 WHERE CONTENT_ID = ID;
+        end if;
+    ELSE
+        SELECT SERIAL INTO S1 FROM "Questions" WHERE Q_ID = ID;
+        SELECT COUNT(Q_ID) INTO  CNT FROM "Questions" WHERE E_ID = FID AND SERIAL>S1;
+        IF CNT>0 THEN
+            SELECT MIN(SERIAL) INTO S2 FROM "Questions" WHERE E_ID = FID AND SERIAL>S1;
+            SELECT Q_ID INTO ID2 FROM "Questions" WHERE E_ID = FID AND SERIAL = S2;
+            UPDATE "Questions" SET SERIAL = S1 WHERE Q_ID = ID2;
+            UPDATE "Questions" SET SERIAL = S2 WHERE Q_ID = ID;
+        end if;
+    end if;
+end;
+/
+
+create PROCEDURE NOTIFY_STUDENTS(CID IN NUMBER) IS
+CURSOR C1 IS SELECT S_ID FROM "Enrollment" WHERE COURSE_ID = CID;
+CNT NUMBER;
+BEGIN
+    FOR C IN C1
+    LOOP
+        SELECT COUNT(ID) INTO CNT FROM "Notifications" WHERE U_ID = C.S_ID AND KEY = CID AND "FOR" = 'post';
+        IF CNT = 0 THEN
+            INSERT INTO "Notifications"(U_ID, "FOR",KEY) VALUES (C.S_ID,'post',CID);
+        ELSE
+            UPDATE "Notifications" SET SEEN = 0 WHERE U_ID = C.S_ID AND KEY = CID AND "FOR" = 'post';
+        end if;
+
+    end loop;
 end;
 /
 

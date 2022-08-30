@@ -9,7 +9,29 @@ import cx_Oracle
 from Utils.fetcher import dictfetchall, dictfetchone
 
 # Create your views here.
+def notiCount(request):
+    role = request.session["role"]
+    user_id = request.session["userid"]
+    with connections['eschool_db'].cursor() as c:
+        if role == 'student':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'teacher':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION 
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ORDER BY ID DESC''', [user_id,user_id,user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'admin':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE (U_ID = %s OR "FOR" = 'admin') AND SEEN = 0 ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+
 def course_details(request,course_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT * FROM "Courses"
                         WHERE "COURSE_ID"=%s ''', [course_id])
@@ -72,38 +94,71 @@ def course_details(request,course_id):
             return redirect('/profile/'+str(course["T_ID"])+'')
 
 def forum(request,course_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT * FROM "Forums" JOIN "Users" U on U.USER_ID = "Forums".U_ID WHERE C_ID = %s ORDER BY F_ID DESC
                     ''', [course_id])
         comments = dictfetchall(c)
     return render(request,'forum.html',{'comments':comments,'cid':course_id})
 def add_comment(request,course_id):
+    notiCount(request)
     des = request.POST["comment_text"]
     print(des)
     with connections['eschool_db'].cursor() as c:
         c.execute('''INSERT INTO "Forums"(C_ID, U_ID, DESCRIPTION) VALUES (%s,%s,%s)
                     ''', [course_id,request.session["userid"],des])
+        if request.session["role"] == 'student':
+            c.execute('''SELECT COUNT(ID) CNT FROM "Notifications" WHERE KEY = %s AND "FOR" = 'teacher4' ''',[course_id])
+            en = dictfetchone(c)
+            if en["CNT"]==0:
+                c.execute('''INSERT INTO "Notifications"("FOR",KEY) VALUES ('teacher4',%s) ''',[course_id])
+            else:
+                c.execute('''UPDATE "Notifications" SET SEEN = 0 WHERE KEY = %s AND "FOR" = 'teacher4' ''',[course_id])
+        elif request.session["role"] == 'teacher':
+            c.callproc('NOTIFY_STUDENTS',[course_id])
+        else:
+            c.callproc('NOTIFY_STUDENTS',[course_id])
+            c.execute('''SELECT COUNT(ID) CNT FROM "Notifications" WHERE KEY = %s AND "FOR" = 'teacher4' ''',[course_id])
+            en = dictfetchone(c)
+            if en["CNT"]==0:
+                c.execute('''INSERT INTO "Notifications"("FOR",KEY) VALUES ('teacher4',%s) ''',[course_id])
+            else:
+                c.execute('''UPDATE "Notifications" SET SEEN = 0 WHERE KEY = %s AND "FOR" = 'teacher4' ''',[course_id])
     return redirect('/course/'+str(course_id)+'/forum')
 def add_reply(request,course_id,forum_id):
+    notiCount(request)
     des = request.POST["reply"]
     with connections['eschool_db'].cursor() as c:
         c.execute('''INSERT INTO "Forums"(C_ID, U_ID, PAR_COM_ID, DESCRIPTION) VALUES (%s,%s,%s,%s)
                     ''', [course_id,request.session["userid"],forum_id,des])
         c.execute('''UPDATE "Forums" SET CHILD = CHILD + 1 WHERE F_ID = %s
                     ''', [forum_id])
+        c.execute('''SELECT U_ID FROM "Forums" WHERE F_ID = %s
+                    ''', [forum_id])
+        en = dictfetchone(c)
+        uid = en["U_ID"]
+        c.execute('''SELECT COUNT(ID) CNT FROM "Notifications" WHERE U_ID = %s AND KEY = %s AND "FOR" = 'reply' ''',[uid,course_id])
+        en = dictfetchone(c)
+        if en["CNT"]==0:
+            c.execute('''INSERT INTO "Notifications"(U_ID, "FOR",KEY) VALUES (%s,'reply',%s) ''',[uid,course_id])
+        else:
+            c.execute('''UPDATE "Notifications" SET SEEN = 0 WHERE U_ID = %s AND KEY = %s AND "FOR" = 'reply' ''',[uid,course_id])
     return redirect('/course/'+str(course_id)+'/forum')
 def edit_comment(request,course_id,forum_id):
+    notiCount(request)
     des = request.POST["description"]
     with connections['eschool_db'].cursor() as c:
         c.execute('''UPDATE "Forums" SET DESCRIPTION = %s WHERE F_ID = %s
                     ''', [des,forum_id])
     return redirect('/course/'+str(course_id)+'/forum')
 def delete_comment(request,course_id,forum_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc("DELETE_FORUM",[forum_id])
     return redirect('/course/'+str(course_id)+'/forum')
 
 def topic(request,course_id,topic_id):
+    notiCount(request)
     sid = -1
     if request.session.has_key('userid'):
         sid = request.session["userid"]
@@ -145,6 +200,7 @@ def topic(request,course_id,topic_id):
     return render(request,'topic.html',{'contents':contents,'cid':course_id,'tid':topic_id,'role':role})
 
 def content(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         if request.session.has_key('userid'):
             if request.session['role']=="teacher":
@@ -229,12 +285,15 @@ def content(request,course_id,topic_id,content_id):
             return render(request,'login.html',{'error':'You must login first'})
 
 def enroll(request,course_id,user_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''INSERT INTO "Enrollment"(S_ID, COURSE_ID) VALUES (%s,%s)
                         ''', [user_id,course_id])
+        c.execute('''INSERT INTO "Notifications"(U_ID,"FOR",KEY) VALUES (%s,'teacher3',%s) ''',[user_id,course_id])
     return redirect('/course/'+str(course_id)+'')
 
 def add_instructor(request,course_id):
+    notiCount(request)
     if request.method=='POST':
         email = request.POST["email"]
         with connections['eschool_db'].cursor() as c:
@@ -250,16 +309,19 @@ def add_instructor(request,course_id):
     return redirect('/course/'+str(course_id)+'')
 
 def remove_instructor(request,course_id,user_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''DELETE FROM "Contribute" WHERE C_ID = %s AND T_ID = %s
                 ''', [course_id,user_id])
     return redirect('/course/'+str(course_id)+'')
 def remove_topic(request,course_id,topic_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('DELETE_TOPIC',[topic_id])
     return redirect('/course/'+str(course_id)+'')
 
 def add_topic(request,course_id):
+    notiCount(request)
     if request.method=='POST':
         title = request.POST["name"]
         description = request.POST["description"]
@@ -269,6 +331,7 @@ def add_topic(request,course_id):
     return redirect('/course/'+str(course_id)+'')
 
 def edit_topic(request,course_id,topic_id):
+    notiCount(request)
     if request.method=='POST':
         title = request.POST["name"]
         description = request.POST["description"]
@@ -277,17 +340,20 @@ def edit_topic(request,course_id,topic_id):
                         ''', [title,description,topic_id])
     return redirect('/course/'+str(course_id)+'')
 def up_topic(request,course_id,topic_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('UP',[topic_id,course_id,'T'])
         
     return redirect('/course/'+str(course_id)+'')
 def down_topic(request,course_id,topic_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('DOWN',[topic_id,course_id,'T'])
         
     return redirect('/course/'+str(course_id)+'')
 
 def add_lecture(request,course_id,topic_id):
+    notiCount(request)
     if request.method=='POST':
         title = request.POST["title"]
         description = request.POST["description"]
@@ -304,6 +370,7 @@ def add_lecture(request,course_id,topic_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def add_quiz(request,course_id,topic_id):
+    notiCount(request)
     if request.method=='POST':
         title = request.POST["title"]
         with connections['eschool_db'].cursor() as c:
@@ -317,11 +384,13 @@ def add_quiz(request,course_id,topic_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def remove_content(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('DELETE_CONTENT',[content_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def edit_content(request,course_id,topic_id,content_id):
+    notiCount(request)
     if request.method=='POST':
         title = request.POST["title"]
        
@@ -340,17 +409,20 @@ def edit_content(request,course_id,topic_id,content_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def up_content(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('UP',[content_id,topic_id,'C'])
         
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 def down_content(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('DOWN',[content_id,topic_id,'C'])
         
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def prev(request,course_id,topic_id,content_id):
+    notiCount(request)
     cid = content_id
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT SERIAL FROM "Contents" WHERE CONTENT_ID = %s
@@ -375,6 +447,7 @@ def prev(request,course_id,topic_id,content_id):
             return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def next(request,course_id,topic_id,content_id):
+    notiCount(request)
     cid = content_id
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT SERIAL FROM "Contents" WHERE CONTENT_ID = %s
@@ -399,6 +472,7 @@ def next(request,course_id,topic_id,content_id):
             return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id))
 
 def complete(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT COUNT(*) CN FROM "Completion" WHERE S_ID = %s AND L_ID = %s
                         ''', [request.session["userid"],content_id])
@@ -409,6 +483,7 @@ def complete(request,course_id,topic_id,content_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id)+'/next')
 
 def add_mcq(request,course_id,topic_id,content_id):
+    notiCount(request)
     if request.method=='POST':
         with connections['eschool_db'].cursor() as c:
             question = request.POST["question"]
@@ -423,6 +498,7 @@ def add_mcq(request,course_id,topic_id,content_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def add_short(request,course_id,topic_id,content_id):
+    notiCount(request)
     if request.method=='POST':
         with connections['eschool_db'].cursor() as c:
             question = request.POST["question"]
@@ -432,6 +508,7 @@ def add_short(request,course_id,topic_id,content_id):
                             ''', [content_id,question,ra,mark,'short'])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 def edit_question(request,course_id,topic_id,content_id,q_id):
+    notiCount(request)
     if request.method=='POST':
         with connections['eschool_db'].cursor() as c:
             c.execute('''SELECT TYPE FROM "Questions" WHERE Q_ID = %s
@@ -456,20 +533,24 @@ def edit_question(request,course_id,topic_id,content_id,q_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def delete_question(request,course_id,topic_id,content_id,q_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''DELETE FROM "Questions" WHERE Q_ID = %s
                         ''', [q_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 def up_question(request,course_id,topic_id,content_id,q_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('UP',[q_id,content_id,'Q'])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 def down_question(request,course_id,topic_id,content_id,q_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('DOWN',[q_id,content_id,'Q'])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def give_exam(request,course_id,topic_id,content_id):
+    notiCount(request)
     print(request.POST)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT Q_ID,RA,NUM FROM
@@ -500,12 +581,14 @@ def give_exam(request,course_id,topic_id,content_id):
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def lock_exam(request,course_id,topic_id,content_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''UPDATE "Take_Exams" SET STATUS = 1 WHERE S_ID = %s AND E_ID = %s
                         ''', [request.session["userid"],content_id])
     return redirect('/course/'+str(course_id)+'/topic/'+str(topic_id)+'/content/'+str(content_id))
 
 def add_review(request,course_id):
+    notiCount(request)
     if request.method=='POST':
         ratting = request.POST["ratting"]
         review = request.POST["review"]
@@ -515,6 +598,7 @@ def add_review(request,course_id):
             c.callproc("UPDATE_RATTING",[course_id])
     return redirect('/course/'+str(course_id)+'')
 def edit_review(request,course_id):
+    notiCount(request)
     if request.method=='POST':
         ratting = request.POST["ratting"]
         review = request.POST["review"]
@@ -524,6 +608,7 @@ def edit_review(request,course_id):
             c.callproc("UPDATE_RATTING",[course_id])
     return redirect('/course/'+str(course_id)+'')
 def delete_review(request,course_id):
+    notiCount(request)
     print("Delete_review",request.session["userid"],course_id)
     with connections['eschool_db'].cursor() as c:
         c.execute('''DELETE FROM "Feedback" WHERE S_ID = %s AND C_ID = %s

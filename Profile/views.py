@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 from django.db import connections
 import cx_Oracle
+from Authentication.views import home
 from Utils.HashPass import passlib_encryption_verify
 
 from Utils.fetcher import dictfetchall, dictfetchone
@@ -12,6 +13,7 @@ from datetime import date
 
 # Create your views here.
 def profile(request,user_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         msg = c.callfunc("CHECK_USER",cx_Oracle.STRING,[user_id])
         print(msg,user_id)
@@ -37,7 +39,7 @@ def profile(request,user_id):
             courses = dictfetchall(c)
             #courses["Date"] = today - courses["Date"].date()
             print(courses)
-        return render(request,'student_profile.html', {'num_of_not':5,'user':user,'owner':ownProfile,'courses':courses})
+        return render(request,'student_profile.html', {'user':user,'owner':ownProfile,'courses':courses})
     elif msg=='teacher':
         with connections['eschool_db'].cursor() as c:
             c.execute('''SELECT * FROM "Teachers"
@@ -55,14 +57,17 @@ def profile(request,user_id):
                         WHERE "T_ID"=%s) ''', [user_id])
             contributed_course = dictfetchall(c)
             user["role"] = "Teacher"
-        return render(request,'teacher_profile.html',  {'num_of_not':5,'user':user,'owner':ownProfile,'taken_course':taken_course, 'contributed_course': contributed_course})
+        return render(request,'teacher_profile.html',  {'user':user,'owner':ownProfile,'taken_course':taken_course, 'contributed_course': contributed_course})
     elif msg=='admin':
         user["role"] = "Admin"
-        return render(request,'admin_profile.html',  {'num_of_not':5,'user':user,'owner':ownProfile})
+        return render(request,'admin_profile.html',  {'user':user,'owner':ownProfile})
     else:
         return render(request,'login.html',{'error':'Invalid UserID'})
 
 def setting(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         if request.session["role"] == "student":
             c.execute('''select * from "Users" join "Students" S on "Users".USER_ID = S.S_ID WHERE USER_ID = %s ''', [user_id])
@@ -72,6 +77,9 @@ def setting(request,user_id):
     return render(request,'setting.html',{'user':user})
 
 def change_password(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     if request.method=='POST':
         npas = request.POST["npassword"]
         cpas = request.POST["cpassword"]
@@ -85,6 +93,9 @@ def change_password(request,user_id):
     return redirect(setting,user_id)
 
 def edit_info(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     if request.method=='POST':
         with connections['eschool_db'].cursor() as c:
             pas = request.POST["password"]
@@ -102,11 +113,70 @@ def edit_info(request,user_id):
                         c.execute('''UPDATE "Teachers" SET DESIGNATION = %s WHERE T_ID = %s''', [designation,user_id])
     return redirect(setting,user_id)
 
-
+def notiCount(request):
+    role = request.session["role"]
+    user_id = request.session["userid"]
+    with connections['eschool_db'].cursor() as c:
+        if role == 'student':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'teacher':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION 
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ORDER BY ID DESC''', [user_id,user_id,user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
+        elif role == 'admin':
+            c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE (U_ID = %s OR "FOR" = 'admin') AND SEEN = 0 ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchone(c)
+            request.session["notif"] = newNotif["CN"]
 def notification(request,user_id):
-    return render(request,'notification.html')
+    if user_id != request.session["userid"]:
+        return redirect(home)
+    role = request.session["role"]
+    with connections['eschool_db'].cursor() as c:
+        if role == 'student':
+            c.execute('''SELECT * FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchall(c)
+            c.execute('''SELECT * FROM "Notifications" WHERE SEEN = 1 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
+            prevNotif = dictfetchall(c)
+            c.execute('''update "Notifications" set SEEN = 1 where U_ID = %s AND "FOR" <> 'teacher3' ''', [user_id])
+            return render(request,'notification.html',{'newNotif':newNotif,'prevNotif':prevNotif})
+        elif role == 'teacher':
+            c.execute('''SELECT * FROM "Notifications" WHERE SEEN = 0 AND (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION 
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ORDER BY ID DESC''', [user_id,user_id,user_id])
+            newNotif = dictfetchall(c)
+            c.execute('''SELECT * FROM "Notifications" WHERE SEEN = 1 AND (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION 
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ORDER BY ID DESC''', [user_id,user_id,user_id])
+            prevNotif = dictfetchall(c)
+            c.execute('''UPDATE "Notifications" SET SEEN = 1 WHERE (U_ID = %s OR ("FOR" LIKE 'teacher_' AND KEY IN (
+                        (SELECT COURSE_ID FROM "Courses" WHERE T_ID = %s)
+                        UNION
+                        (SELECT C_ID FROM "Contribute" WHERE T_ID = %s)
+                        ))) ''', [user_id,user_id,user_id])
+            return render(request,'notification.html',{'newNotif':newNotif,'prevNotif':prevNotif})
+        else:
+            c.execute('''SELECT * FROM "Notifications" WHERE (U_ID = %s OR "FOR" = 'admin') AND SEEN = 0 ORDER BY ID DESC''', [user_id])
+            newNotif = dictfetchall(c)
+            c.execute('''SELECT * FROM "Notifications" WHERE (U_ID = %s OR "FOR" = 'admin') AND SEEN = 1 ORDER BY ID DESC''', [user_id])
+            prevNotif = dictfetchall(c)
+            c.execute('''UPDATE "Notifications" SET SEEN = 1 WHERE "FOR" = 'admin' OR U_ID = %s''', [user_id])
+            return render(request,'notification.html',{'newNotif':newNotif,'prevNotif':prevNotif})
+
 
 def progress(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT E.COURSE_ID COURSE_ID
                     FROM "Courses" C, "Enrollment" E
@@ -127,6 +197,9 @@ def progress(request,user_id):
 
 
 def add_course(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     if request.method=='POST':
         course = request.POST
         with connections['eschool_db'].cursor() as c:
@@ -156,10 +229,16 @@ def add_course(request,user_id):
                 return render(request,'teacher_profile.html',  {'num_of_not':5,'user':user,'owner':1,'taken_course':taken_course, 'contributed_course': contributed_course, 'error':error})
             else:
                 c.execute('''INSERT INTO "Courses"(T_ID, TITLE, DESCRIPTIONS) VALUES (%s,%s,%s)''', [user_id,course["title"],course["description"]])
+                c.execute('''SELECT COURSE_ID FROM "Courses" WHERE TITLE = %s''', [course["title"]])
+                cid = dictfetchone(c)
+                c.execute('''INSERT INTO "Notifications"("FOR",KEY) VALUES ('admin',%s) ''',[cid["COURSE_ID"]])
                 return redirect(profile,user_id)
 
 
 def edit_course(request,user_id,course_id ):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     if request.method=='POST':
         course = request.POST
         with connections['eschool_db'].cursor() as c:
@@ -176,6 +255,9 @@ def edit_course(request,user_id,course_id ):
                      c.execute('''UPDATE "Courses" SET DESCRIPTIONS = %s,TITLE = %s WHERE COURSE_ID = %s ''', [course['description'],course['title'],course_id])
     return redirect(profile,user_id)
 def delete_course(request,user_id,course_id ):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         pas = request.POST["password"]
         c.execute('''SELECT PASSWORD FROM "Users" WHERE USER_ID = %s ''', [user_id])
@@ -196,6 +278,9 @@ def delete_course(request,user_id,course_id ):
     return redirect(profile,user_id)
 
 def approve_student(request,user_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT (SELECT NAME FROM "Users" WHERE USER_ID = E.S_ID) NAME, (SELECT TITLE FROM "Courses" WHERE E.COURSE_ID = "Courses".COURSE_ID) TITLE, ENROLL_ID ID,S_ID,COURSE_ID
                         FROM "Enrollment" E
@@ -205,29 +290,43 @@ def approve_student(request,user_id):
     return render(request,'student_approval.html',{'enrollments':enrollments})
 
 def accept_student(request,user_id,course_id,s_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         c.callproc("APPROVED_STUDENT",[s_id,course_id])
+        c.execute('''INSERT INTO "Notifications"(U_ID, "FOR",KEY) VALUES (%s,'accept',%s) ''',[s_id,course_id])
+        c.execute('''DELETE FROM "Notifications" WHERE ID in (SELECT ID FROM "Notifications" WHERE KEY = %s AND "FOR" = 'teacher3' AND U_ID = %s) ''',[course_id,s_id])
     return redirect('/profile/'+str(request.session["userid"])+'/approve_student')
 def reject_student(request,user_id,course_id,s_id):
+    notiCount(request)
+    if user_id != request.session["userid"]:
+        return redirect(home)
     with connections['eschool_db'].cursor() as c:
         c.callproc("REEJECTED_STUDENT",[s_id,course_id])
+        c.execute('''DELETE FROM "Notifications" WHERE ID in (SELECT ID FROM "Notifications" WHERE KEY = %s AND "FOR" = 'teacher3' AND U_ID = %s) ''',[course_id,s_id])
     return redirect('/profile/'+str(request.session["userid"])+'/approve_student')
 
 def course_approval(request):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.execute('''SELECT * FROM "Courses","Users" WHERE APPROVED = 0 AND "Courses".T_ID = USER_ID ''')
         courses = dictfetchall(c)
     return render(request,'course_approval.html',{'courses':courses})
 
 def accept_course(request,course_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('APPROVED_COURSE',[course_id])
+        c.execute('''INSERT INTO "Notifications"("FOR",KEY) VALUES ('teacher1',%s) ''',[course_id])
+        c.execute('''DELETE FROM "Notifications" WHERE ID in (SELECT ID FROM "Notifications" WHERE KEY = %s AND "FOR" = 'admin') ''',[course_id])
     return redirect('/profile/admin/course_approval')
 
 def reject_course(request,course_id):
+    notiCount(request)
     with connections['eschool_db'].cursor() as c:
         c.callproc('REEJECTED_COURSE',[course_id])
-            
+        c.execute('''DELETE FROM "Notifications" WHERE ID in (SELECT ID FROM "Notifications" WHERE KEY = %s AND "FOR" = 'admin')''',[course_id])    
     return redirect('/profile/admin/course_approval')
 
 
