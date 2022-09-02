@@ -10,8 +10,12 @@ from Utils.fetcher import *
 
 # Create your views here.
 def notiCount(request):
-    role = request.session["role"]
-    user_id = request.session["userid"]
+    if request.session.has_key('role'):
+        role = request.session["role"]
+        user_id = request.session["userid"]
+    else:
+        role = 'guest'
+    
     with connections['eschool_db'].cursor() as c:
         if role == 'student':
             c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])

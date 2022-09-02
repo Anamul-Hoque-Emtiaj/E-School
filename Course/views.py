@@ -10,8 +10,12 @@ from Utils.fetcher import dictfetchall, dictfetchone
 
 # Create your views here.
 def notiCount(request):
-    role = request.session["role"]
-    user_id = request.session["userid"]
+    if request.session.has_key('role'):
+        role = request.session["role"]
+        user_id = request.session["userid"]
+    else:
+        role = 'guest'
+    
     with connections['eschool_db'].cursor() as c:
         if role == 'student':
             c.execute('''SELECT COUNT(ID) CN FROM "Notifications" WHERE SEEN = 0 AND U_ID = %s AND "FOR" <> 'teacher3' ORDER BY ID DESC''', [user_id])
@@ -562,7 +566,7 @@ def give_exam(request,course_id,topic_id,content_id):
         mark = 0
         for question in questions:
             temp = str(question["Q_ID"])
-            if request.POST[temp] == question["RA"]:
+            if request.POST[temp].upper() == question["RA"].upper():
                 mark = mark + question["NUM"]
         c.execute('''SELECT COUNT(S_ID) CN FROM "Take_Exams" WHERE S_ID = %s AND E_ID = %s
                         ''', [request.session["userid"],content_id])

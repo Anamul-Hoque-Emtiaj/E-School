@@ -87,7 +87,7 @@
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Pending</td>
                             {% elif course.ISAPPROVED == -1 %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Rejected</td>
-                            {% elif course.PROGRESS == 1 %}
+                            {% elif course.PROGRESS == '100' %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
                             {% else %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
@@ -153,7 +153,7 @@
                         {% if course.ISAPPROVED == 1 %}
                         <tr >
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.TITLE}}</td>
-                            {% if course.PROGRESS == 1 %}
+                            {% if course.PROGRESS == '100' %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
                             {% else %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
@@ -219,7 +219,7 @@
                         {% if course.ISAPPROVED == 1 %}
                         <tr >
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">{{course.TITLE}}</td>
-                            {% if course.PROGRESS == 1 %}
+                            {% if course.PROGRESS == '100' %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Completed</td>
                             {% else %}
                             <td onclick="window.location='/course/{{course.COURSE_ID}}';" style="cursor:pointer;">Running</td>
